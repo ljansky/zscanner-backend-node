@@ -1,6 +1,7 @@
 export const config = {
     PORT: process.env.PORT && parseInt(process.env.PORT, 10) || 10805,
     NODE_ENV: process.env.NODE_ENV || 'development',
+    DEBUG_LEVEL: process.env.DEBUG_LEVEL || 'debug',
 
     VERIFY_CLIENT_TAG: process.env.VERIFY_CLIENT_TAG || false,
 

@@ -1,5 +1,7 @@
 import { default as winston } from 'winston';
 
+import { config } from './config';
+
 const rootFilename = __dirname.replace(/\/lib$/, '');
 
 export function createLogger(fileName: string) {
@@ -25,7 +27,7 @@ function constructLogger() {
         defaultMeta: {
             service: 'zscanner-backend',
         },
-        level: 'debug',
+        level: config.DEBUG_LEVEL,
     });
 }
 
