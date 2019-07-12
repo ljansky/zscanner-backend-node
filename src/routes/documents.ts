@@ -90,7 +90,7 @@ export function newDocumentsRouter(
     if (!body.correlation) { return error('No correlation in the request'); }
     if (!body.patid) { return error('No patid in the request'); }
     if (!body.mode) { return error('No mode in the request'); }
-    if (!body.type) { return error('No type in the request'); }
+    if (!body.type && body.type !== '') { return error('No type in the request'); }
     if (!body.pages || !parseInt(body.pages, 10)) { return error('No pages in the request'); }
     if (!body.datetime || !moment(body.datetime, "MM/DD/YYYY HH:MM").isValid()) { return error('No datetime in the request'); }
 
