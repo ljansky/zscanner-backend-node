@@ -40,8 +40,8 @@ export function newDocumentsRouter(
 
     await documentStorage.submitDocumentPage(body.correlation, pageIndex, pageFile.path);
 
-    ctx.response.status = 201;
-    ctx.response.message = `Created`;
+    ctx.response.status = 200;
+    ctx.response.message = `OK`;
 
     function error(message: string, status = 400) {
       ctx.response.status = status;

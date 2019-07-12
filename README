@@ -86,5 +86,5 @@
     page: 0,
     page (file): ...contents-of-the-image...
 
-  201 Created
+  200 OK
 ```
