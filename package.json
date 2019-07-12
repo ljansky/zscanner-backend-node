@@ -14,7 +14,8 @@
     "ts-demo": "env ZSCANNER_AUTHENTICATOR=noop ZSCANNER_STORAGE=demo npx ts-node src/index",
     "prd": "pm2 start out/index",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "heroku-postbuild": ""
   },
   "husky": {
     "hooks": {
