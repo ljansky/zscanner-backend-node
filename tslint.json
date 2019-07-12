@@ -1,0 +1,45 @@
+{
+  "extends": [
+    "tslint-eslint-rules",
+    "tslint:latest"
+  ],
+  "linterOptions": {
+    "exclude": [
+      "node_modules/**/*.ts"
+    ]
+  },
+  "rules": {
+    "quotemark": false,
+    "function-constructor": false,
+    "no-var-requires": false,
+    "object-literal-sort-keys": false,
+    "object-literal-key-quotes": false,
+    "only-arrow-functions": false,
+    "no-console": false,
+    "no-empty-interface": false,
+    "no-reference": false,
+    "no-string-literal": false,
+    "interface-name": false,
+    "member-ordering": [true, "public-before-private", "variables-before-functions"],
+    "variable-name": false,
+    "max-classes-per-file": false,
+    "max-line-length": false,
+    "no-this-assignment": false,
+    "no-implicit-dependencies": false,
+    "no-invalid-template-strings": false,
+    "no-submodule-imports": false,
+    "array-type": false,
+    "semicolon": [true, "always"],
+    "trailing-comma": [true, {"multiline": "always", "singleline": "never"}],
+    "object-curly-spacing": true,
+    "ordered-imports": [
+      true,
+      {
+        "import-sources-order": "lowercase-first",
+        "named-imports-order": "lowercase-first",
+        "grouped-imports": true
+      }
+    ],
+    "prefer-object-spread": false
+  }
+}
