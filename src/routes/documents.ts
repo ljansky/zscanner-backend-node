@@ -92,7 +92,7 @@ export function newDocumentsRouter(
     if (!body.mode) { return error('No mode in the request'); }
     if (!body.type && body.type !== '') { return error('No type in the request'); }
     if (!body.pages || !parseInt(body.pages, 10)) { return error('No pages in the request'); }
-    if (!body.datetime || !moment(body.datetime, "MM/DD/YYYY HH:MM").isValid()) { return error('No datetime in the request'); }
+    if (!body.datetime || !moment(body.datetime, "MM/DD/YYYY HH:mm").isValid()) { return error('No datetime in the request'); }
 
     const summary: DocumentSummary = {
       folderInternalId: body.patid,
