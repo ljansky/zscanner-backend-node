@@ -1,7 +1,7 @@
 {
   "name": "zscanner-backend",
   "description": "zScanner backend server. For or extend for your particular needs.",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "main": "out/app.js",
   "typings": "out/app.d.ts",
   "author": "Institute for Clinical and Experimental Medicine",
