@@ -99,7 +99,7 @@ export function newDocumentsRouter(
       documentMode: body.mode,
       documentType: body.type,
       pages: parseInt(body.pages, 10),
-      datetime: moment(body.datetime, "MM/DD/YYYY HH:MM").valueOf(),
+      datetime: moment(body.datetime, "MM/DD/YYYY HH:mm").valueOf(),
       name: body.name,
       notes: body.notes,
       user: ctx.state.userId,
