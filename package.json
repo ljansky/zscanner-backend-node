@@ -9,7 +9,7 @@
   "private": false,
   "scripts": {
     "build": "rm -rf out && tsc",
-    "start": "npm run build && node out/index",
+    "start": "npm ci && node out/index",
     "ts-start": "npx ts-node src/index",
     "ts-demo": "env ZSCANNER_AUTHENTICATOR=noop ZSCANNER_STORAGE=demo npx ts-node src/index",
     "prd": "pm2 start out/index",
