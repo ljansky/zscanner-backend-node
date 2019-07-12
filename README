@@ -72,7 +72,7 @@
     notes: "Poznamky"
   }
 
-  201 Created
+  200 OK
 ```
 
 ### Submit Document Page

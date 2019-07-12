@@ -73,8 +73,8 @@ export function newDocumentsRouter(
 
     await documentStorage.submitDocumentSummary(body.correlation, summary);
 
-    ctx.response.status = 201;
-    ctx.response.message = `Created`;
+    ctx.response.status = 200;
+    ctx.response.message = `OK`;
 
     function error(message: string, status = 400) {
       ctx.response.status = status;
