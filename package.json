@@ -9,12 +9,12 @@
   "private": false,
   "scripts": {
     "build": "rm -rf out && npx tsc",
-    "start": "env NODE_ENV=dev npm ci && node out/index",
+    "start": "node out/index",
     "ts-start": "npx ts-node src/index",
     "ts-demo": "env ZSCANNER_AUTHENTICATOR=noop ZSCANNER_STORAGE=demo npx ts-node src/index",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "npm run build",
-    "heroku-postbuild": ""
+    "heroku-postbuild": "npm ci && npm run build"
   },
   "husky": {
     "hooks": {
