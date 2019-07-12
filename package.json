@@ -1,6 +1,11 @@
 {
   "name": "zscanner-backend",
+  "description": "zScanner backend server. For or extend for your particular needs.",
   "version": "0.9.0",
+  "main": "out/app.js",
+  "typings": "out/app.d.ts",
+  "author": "Institute for Clinical and Experimental Medicine",
+  "license": "MIT",
   "private": false,
   "scripts": {
     "build": "rm -rf out && tsc",
@@ -8,13 +13,17 @@
     "ts-start": "npx ts-node src/index",
     "ts-demo": "env ZSCANNER_AUTHENTICATOR=noop ZSCANNER_STORAGE=demo npx ts-node src/index",
     "prd": "pm2 start out/index",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "npm run build"
   },
   "husky": {
     "hooks": {
       "pre-commit": "npx tslint --project ."
     }
   },
+  "files": [
+    "out/"
+  ],
   "dependencies": {
     "debug": "^2.6.3",
     "fresh": "^0.5.2",

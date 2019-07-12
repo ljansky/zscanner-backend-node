@@ -26,7 +26,7 @@ async function start() {
 }
 
 function constructAuthenticator(): Authenticator {
-    if (config.AUTHENTICATOR === 'seacat' 
+    if (config.AUTHENTICATOR === 'seacat'
         && config.VERIFY_CLIENT_TAG
         && config.SEACAT_ENDPOINT
         && config.SEACAT_USERNAME
