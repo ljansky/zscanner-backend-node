@@ -13,7 +13,7 @@ import { Authenticator, DocumentStorage } from "./services/types";
 export { config } from "./lib/config";
 export { createLogger } from "./lib/logging";
 export * from "./lib/utils";
-export { Authenticator, DocumentStorage, Patient, DocumentFolder, DocumentType, DocumentMode, DocumentSummary } from "./services/types";
+export * from "./services/types";
 export { newNoopAuthenticator } from "./services/authenticators/noop";
 export { newSeacatAuthenticator } from "./services/authenticators/seacat";
 export { newDemoDocumentStorage } from "./services/document-storages/demo";

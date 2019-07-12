@@ -19,8 +19,8 @@ export interface DocumentStorage {
 }
 
 export interface DocumentFolder {
-    bid: string;
-    zid: string;
+    externalId: string;
+    internalId: string;
     name: string;
 }
 
@@ -39,6 +39,17 @@ export interface DocumentType {
 }
 
 export interface DocumentSummary {
+    folderInternalId: string;
+    documentMode: DocumentMode;
+    documentType: string;
+    pages: number;
+    datetime: number;
+    name: string;
+    notes: string;
+    user: string;
+}
+
+export interface PatientDocumentSummary {
     patid: string;
     mode: DocumentMode;
     type: string;

@@ -31,13 +31,13 @@ export function newDemoDocumentStorage(
         query = normalizeString(query);
 
         return DEMO_FOLDERS
-            .filter((f) => normalizeString(f.bid).indexOf(query) > -1
-                                    || normalizeString(f.zid).indexOf(query) > -1
+            .filter((f) => normalizeString(f.externalId).indexOf(query) > -1
+                                    || normalizeString(f.internalId).indexOf(query) > -1
                                     || normalizeString(f.name).indexOf(query) > -1);
     }
 
     async function getFolderByBarcode(folderBarcode: string): Promise<DocumentFolder | undefined> {
-        return DEMO_FOLDERS.find((f) => f.zid === folderBarcode);
+        return DEMO_FOLDERS.find((f) => f.internalId === folderBarcode);
     }
 
     async function getDocumentTypes(): Promise<DocumentType[]> {
@@ -59,33 +59,33 @@ export function newDemoDocumentStorage(
  */
 const DEMO_FOLDERS: DocumentFolder[] = [
     {
-        bid: '925221/9449',
-        zid: '124587112',
+        externalId: '925221/9449',
+        internalId: '124587112',
         name: 'Radana Macháčková',
     },
     {
-        bid: '011116/0632',
-        zid: '124587113',
+        externalId: '011116/0632',
+        internalId: '124587113',
         name: 'František Chadima',
     },
     {
-        bid: '995507/4789',
-        zid: '124587116',
+        externalId: '995507/4789',
+        internalId: '124587116',
         name: 'Aneta Šálková',
     },
     {
-        bid: '760623/6979',
-        zid: '124587154',
+        externalId: '760623/6979',
+        internalId: '124587154',
         name: 'Servác Skoumal',
     },
     {
-        bid: '841206/2483',
-        zid: '124587154',
+        externalId: '841206/2483',
+        internalId: '124587154',
         name: 'Petr Šmídek',
     },
     {
-        bid: '806007/3351',
-        zid: '124587199',
+        externalId: '806007/3351',
+        internalId: '124587199',
         name: 'Jiřina Hozová',
     },
 ];

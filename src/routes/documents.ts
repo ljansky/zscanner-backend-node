@@ -1,5 +1,6 @@
 import * as koa from 'koa';
 import { default as KoaRouter } from 'koa-router';
+import { default as moment } from 'moment';
 
 import { createLogger } from "../lib/logging";
 import { wrapRouteWithErrorHandler } from "../lib/utils";
@@ -19,76 +20,100 @@ export function newDocumentsRouter(
   router.prefix('/api-zscanner');
 
   router.post('/v1/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
-  router.post('/v1/documents/summary', wrapRouteWithErrorHandler(LOG, postSummary));
-
+  router.post('/v1/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
   router.post('/v2/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
-  router.post('/v2/documents/summary', wrapRouteWithErrorHandler(LOG, postSummary));
+  router.post('/v2/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
+  router.post('/v3/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
+  router.post('/v3/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV3));
 
   async function postPage(ctx: koa.Context) {
-    // chect request type is multipart/form-data
-    if (ctx.request.type !== `multipart/form-data`) {
-      ctx.response.status = 400;
-      ctx.response.message = 'Not multipart/form-data';
-      return;
+    if (ctx.request.type !== `multipart/form-data`) { return error('Not multipart/form-data'); }
+    const body = ctx.request.body;
+    const pageFile = (ctx.request as any).files.page;
+
+    if (!body) { return error('No body in the request'); }
+    if (!pageFile) { return error('No page in request'); }
+    if (!body.correlation) { return error('No correlation in the request'); }
+    if (!body.page || !isFinite(parseInt(body.page, 10))) { return error('No page in the request'); }
+
+    const pageIndex = parseInt(body.page, 10);
+
+    await documentStorage.submitDocumentPage(body.correlation, pageIndex, pageFile.path);
+
+    ctx.response.status = 201;
+    ctx.response.message = `Created`;
+
+    function error(message: string, status = 400) {
+      ctx.response.status = status;
+      ctx.response.message = `Required fields missing`;
     }
-
-    // check file attached to multipart post request
-    if (!((ctx.request as any).files.page)) {
-      ctx.response.status = 400;
-      ctx.response.message = 'No page in request';
-      return;
-    }
-
-    // check reqired post fields
-    if (!(ctx.request.body.page) || !(ctx.request.body.correlation)) {
-      ctx.response.status = 400;
-      ctx.response.message = 'Required fields missing';
-      return;
-    }
-
-    const pageIndex = parseInt(ctx.request.body.page, 10);
-    const filePath = (ctx.request as any).files.page.path;
-
-    await documentStorage.submitDocumentPage(ctx.request.body.correlation, pageIndex, filePath);
-
-    ctx.response.status = 200;
-    ctx.response.message = `OK`;
   }
 
-  async function postSummary(ctx: koa.Context) {
-    // chect request type is multipart/form-data
-    if (ctx.request.type !== `multipart/form-data`) {
-      ctx.response.status = 400;
-      ctx.response.message = 'Not multipart/form-data';
-      return;
-    }
-    // check reqired post fields
-    if (!(ctx.request.body.correlation)  // correleation must not be empty
-        || (ctx.request.body.datetime === undefined)
-        || (ctx.request.body.pages === undefined)
-        || (ctx.request.body.patid === undefined)
-        || (ctx.request.body.type === undefined)
-        || (ctx.request.body.mode === undefined)) {
-      ctx.response.status = 400;
-      ctx.response.message = `Required fields missing`;
-      return;
-    }
+  async function postSummaryV3(ctx: koa.Context) {
+    const body = ctx.request.body;
 
-    const summaryMessageBody: DocumentSummary = {
-      patid: ctx.request.body.patid,
-      mode: ctx.request.body.mode,
-      type: ctx.request.body.type,
-      pages: ctx.request.body.pages,
-      datetime: ctx.request.body.datetime,
-      name: ctx.request.body.name,
-      notes: ctx.request.body.notes,
+    if (!body) { return error('No body in the request'); }
+    if (!body.correlation) { return error('No correlation in the request'); }
+    if (!body.folderInternalId) { return error('No folderInternalId in the request'); }
+    if (!body.documentMode) { return error('No documentMode in the request'); }
+    if (!body.documentType) { return error('No documentType in the request'); }
+    if (!body.pages || !parseInt(body.pages, 10)) { return error('No pages in the request'); }
+    if (!body.datetime || !moment(body.datetime).isValid()) { return error('No datetime in the request'); }
+
+    const summary: DocumentSummary = {
+      folderInternalId: body.folderInternalId,
+      documentMode: body.documentMode,
+      documentType: body.documentType,
+      pages: parseInt(body.pages, 10),
+      datetime: moment(body.datetime).valueOf(),
+      name: body.name,
+      notes: body.notes,
       user: ctx.state.userId,
     };
 
-    await documentStorage.submitDocumentSummary(ctx.request.body.correlation, summaryMessageBody);
+    await documentStorage.submitDocumentSummary(body.correlation, summary);
+
+    ctx.response.status = 201;
+    ctx.response.message = `Created`;
+
+    function error(message: string, status = 400) {
+      ctx.response.status = status;
+      ctx.response.message = `Required fields missing`;
+    }
+  }
+
+  async function postSummaryV1V2(ctx: koa.Context) {
+    if (ctx.request.type !== `multipart/form-data`) { return error('Not multipart/form-data'); }
+    const body = ctx.request.body;
+
+    if (!body) { return error('No body in the request'); }
+    if (!body.correlation) { return error('No correlation in the request'); }
+    if (!body.patid) { return error('No patid in the request'); }
+    if (!body.mode) { return error('No mode in the request'); }
+    if (!body.type) { return error('No type in the request'); }
+    if (!body.pages || !parseInt(body.pages, 10)) { return error('No pages in the request'); }
+    if (!body.datetime || !moment(body.datetime, "MM/DD/YYYY HH:MM").isValid()) { return error('No datetime in the request'); }
+
+    const summary: DocumentSummary = {
+      folderInternalId: body.patid,
+      documentMode: body.mode,
+      documentType: body.type,
+      pages: parseInt(body.pages, 10),
+      datetime: moment(body.datetime, "MM/DD/YYYY HH:MM").valueOf(),
+      name: body.name,
+      notes: body.notes,
+      user: ctx.state.userId,
+    };
+
+    await documentStorage.submitDocumentSummary(body.correlation, summary);
 
     ctx.response.status = 200;
     ctx.response.message = `OK`;
+
+    function error(message: string, status = 400) {
+      ctx.response.status = status;
+      ctx.response.message = message;
+    }
   }
 
   return router;

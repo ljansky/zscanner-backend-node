@@ -20,9 +20,9 @@ export function newDocumentTypesRouter(
 
     router.get('/v1/documenttypes', wrapRouteWithErrorHandler(LOG, getDocumentTypes));
     router.get('/v2/documenttypes', wrapRouteWithErrorHandler(LOG, getDocumentTypes));
+    router.get('/v3/documenttypes', wrapRouteWithErrorHandler(LOG, getDocumentTypes));
 
     async function getDocumentTypes(ctx: koa.Context) {
-        // let pruned = docyptes.map(e => Object.assign({}, { display: e.display, type: e.keyword, mode: e.parent }))
         ctx.body = await documentStorage.getDocumentTypes();
         ctx.response.status = 200;
         ctx.response.message = `OK`;
