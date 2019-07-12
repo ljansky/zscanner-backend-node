@@ -9,7 +9,6 @@
   "private": false,
   "scripts": {
     "build-ts": "rm -rf out && npx tsc",
-    "postinstall": "npm run build-ts",
     "start": "npm run serve",
     "serve": "node out/index",
     "ts-start": "npx ts-node src/index",
