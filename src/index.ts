@@ -8,6 +8,11 @@ import { Authenticator, DocumentStorage } from "./services/types";
 
 const LOG = createLogger(__filename);
 
+process.on("unhandledRejection", (error: any, promise: Promise<any>) => {
+    LOG.error(`Unhandled Rejection: ${error} ${error.stack}`);
+    throw error;
+});
+
 start();
 
 async function start() {

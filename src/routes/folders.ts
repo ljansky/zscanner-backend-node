@@ -20,19 +20,21 @@ export function newFoldersRouter(
 
     router.get('/v1/patients', wrapRouteWithErrorHandler(LOG, getPatientsV1V2));
     router.get('/v2/patients/search', wrapRouteWithErrorHandler(LOG, getPatientsV1V2));
-    router.get('/v2/patients/decode', wrapRouteWithErrorHandler(LOG, getPatientV1V2));
+    router.get('/v2/patients/decode', wrapRouteWithErrorHandler(LOG, getPatientByBarcodeV1V2));
     router.get('/v3/folders/search', wrapRouteWithErrorHandler(LOG, getFoldersV3));
-    router.get('/v3/folders/decode', wrapRouteWithErrorHandler(LOG, getFolderV3));
+    router.get('/v3/folders/decode', wrapRouteWithErrorHandler(LOG, getFolderByBarcodeV3));
 
     async function getPatientsV1V2(ctx: koa.Context) {
-        const folders = ctx.query.query ? await documentStorage.findFolders(ctx.query.query) : [];
+        const query = sanitizeQuery(ctx.query.query);
+        const folders = query ? await documentStorage.findFolders(query) : [];
         ctx.body = folders.map(DocumentFolder2Patient);
         ctx.response.status = 200;
         ctx.response.message = 'OK';
     }
 
-    async function getPatientV1V2(ctx: koa.Context) {
-        const folder = ctx.query.query ? await documentStorage.getFolderByBarcode(ctx.query.query) : undefined;
+    async function getPatientByBarcodeV1V2(ctx: koa.Context) {
+        const query = sanitizeQuery(ctx.query.query);
+        const folder = query ? await documentStorage.getFolderByBarcode(query) : undefined;
         const response = folder ? DocumentFolder2Patient(folder) : folder;
         if (response) {
             ctx.response.body = response;
@@ -43,13 +45,15 @@ export function newFoldersRouter(
     }
 
     async function getFoldersV3(ctx: koa.Context) {
-        ctx.body = ctx.query.query ? await documentStorage.findFolders(ctx.query.query) : [];
+        const query = sanitizeQuery(ctx.query.query);
+        ctx.body = query ? await documentStorage.findFolders(query) : [];
         ctx.response.status = 200;
         ctx.response.message = 'OK';
     }
 
-    async function getFolderV3(ctx: koa.Context) {
-        const response = ctx.query.query ? await documentStorage.getFolderByBarcode(ctx.query.query) : undefined;
+    async function getFolderByBarcodeV3(ctx: koa.Context) {
+        const query = sanitizeQuery(ctx.query.query);
+        const response = query ? await documentStorage.getFolderByBarcode(query) : undefined;
         if (response) {
             ctx.response.body = response;
             ctx.response.status = 200;
@@ -67,4 +71,21 @@ function DocumentFolder2Patient(folder: DocumentFolder): Patient {
         zid: folder.internalId,
         name: folder.name,
     };
+}
+
+function sanitizeQuery(query: string): string | undefined {
+    if (!query) {
+        return;
+    }
+
+    query = `${query}`
+        .replace(/[^\p{L}\p{N}\p{Z}\/.-]/gu, '')
+        .replace(/\p{Z}+/gu, ' ')
+        .trim();
+
+    if (!query) {
+        return;
+    }
+
+    return query;
 }

@@ -3,7 +3,7 @@ import * as util from 'util';
 
 import { createLogger } from "../../lib/logging";
 import { normalizeString } from "../../lib/utils";
-import { DocumentFolder, DocumentStorage, DocumentSummary, DocumentType } from "../types";
+import { DocumentFolder, DocumentStorage, DocumentSummary, DocumentType, HEALTH_LEVEL_OK } from "../types";
 
 const LOG = createLogger(__filename);
 
@@ -21,6 +21,7 @@ export function newDemoDocumentStorage(
         getDocumentTypes,
         submitDocumentPage,
         submitDocumentSummary,
+        getHealth: () => ({ level: HEALTH_LEVEL_OK, messages: [] }),
     };
 
     async function initialize() {

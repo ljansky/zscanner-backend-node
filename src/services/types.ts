@@ -1,12 +1,25 @@
 import * as koa from 'koa';
 
-export interface Authenticator {
+export const HEALTH_LEVEL_OK = 0;
+export const HEALTH_LEVEL_WARNING = 1;
+export const HEALTH_LEVEL_ERROR = 2;
+
+export interface HealthReport {
+    level: number;
+    messages: string[];
+}
+
+export interface HealthConscious {
+    getHealth(): HealthReport;
+}
+
+export interface Authenticator extends HealthConscious {
     initialize(): Promise<void>;
 
     authenticate(context: koa.Context): Promise<boolean>;
 }
 
-export interface DocumentStorage {
+export interface DocumentStorage extends HealthConscious {
     initialize(): Promise<void>;
 
     findFolders(query: string): Promise<DocumentFolder[]>;

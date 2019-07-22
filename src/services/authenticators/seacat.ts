@@ -1,7 +1,7 @@
 import * as koa from 'koa';
 import * as rp from 'request-promise';
 
-import { Authenticator } from "../types";
+import { Authenticator, HEALTH_LEVEL_OK } from "../types";
 
 export function newSeacatAuthenticator(
     {
@@ -17,6 +17,7 @@ export function newSeacatAuthenticator(
     return {
         initialize,
         authenticate,
+        getHealth: () => ({ level: HEALTH_LEVEL_OK, messages: [] }),
     };
 
     // tslint:disable-next-line: no-empty

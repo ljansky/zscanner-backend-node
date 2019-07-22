@@ -41,7 +41,7 @@ export function constructKoaApplication(
         const documentsRouter = newDocumentsRouter({ documentStorage });
         const foldersRouter = newFoldersRouter({ documentStorage });
         const documentTypesRouter = newDocumentTypesRouter({ documentStorage });
-        const healthCheckRouter = newHealthCheckRouter();
+        const healthCheckRouter = newHealthCheckRouter({ components: [documentStorage, authenticator] });
 
         app.use(documentsRouter.routes());
         app.use(foldersRouter.routes());

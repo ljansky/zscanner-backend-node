@@ -1,7 +1,7 @@
 {
   "name": "zscanner-backend",
   "description": "zScanner backend server. For or extend for your particular needs.",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "main": "out/app.js",
   "typings": "out/app.d.ts",
   "author": "Institute for Clinical and Experimental Medicine",
@@ -11,6 +11,8 @@
     "build-ts": "rm -rf out && npx tsc",
     "start": "npm run serve",
     "serve": "node out/index",
+    "tslint-fix": "npx tslint --project . --fix",
+    "tslint": "npx tslint --project .",
     "ts-start": "npx ts-node src/index",
     "ts-demo": "env ZSCANNER_AUTHENTICATOR=noop ZSCANNER_STORAGE=demo npx ts-node src/index",
     "test": "echo \"Error: no test specified\" && exit 1",
