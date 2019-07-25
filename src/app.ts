@@ -53,10 +53,16 @@ export function constructKoaApplication(
         onerror(app);
 
         app.use(async function(ctx: Koa.Context, next: KoaNextFunction) {
-            if (authenticator.authenticate(ctx)) {
+            if (ctx.path.endsWith("/healthcheck")
+                || !ctx.path.startsWith("/api-zscanner")
+                || await authenticator.authenticate(ctx)) {
                 await next();
+            } else {
+                ctx.response.status = 403;
+                ctx.response.message = "Access Denied";
             }
         });
+
         app.use(formidable({
             encoding: 'utf-8',
             maxFileSize: 1000 * 1024 * 1024,

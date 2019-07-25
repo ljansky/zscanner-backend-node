@@ -22,11 +22,11 @@ export function newDocumentTypesRouter(
     router.get('/v2/documenttypes', wrapRouteWithErrorHandler(LOG, getDocumentTypes));
     router.get('/v3/documenttypes', wrapRouteWithErrorHandler(LOG, getDocumentTypes));
 
+    return router;
+
     async function getDocumentTypes(ctx: koa.Context) {
         ctx.body = await documentStorage.getDocumentTypes();
         ctx.response.status = 200;
         ctx.response.message = `OK`;
     }
-
-    return router;
 }

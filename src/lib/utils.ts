@@ -24,7 +24,7 @@ export type RecursivePartial<T> = {
             T[P];
 };
 
-export function normalizeString(s: string) {
+export function normalizeString(s: any) {
     if (s === null || s === undefined) {
         return '';
     }
@@ -37,26 +37,6 @@ export function normalizeString(s: string) {
     s = s.replace(/\s+/g, ' ');
     s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     return s;
-}
-
-export async function withCb<T>(fn: (cb: (err?: T, result?: any) => void) => void) {
-    return new Promise((resolve, reject) => {
-        try {
-            fn((err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result);
-                }
-            });
-        } catch (err) {
-            reject(err);
-        }
-    });
-}
-
-export async function sleep(ms: number) {
-    return withCb((cb) => setTimeout(() => cb(), ms));
 }
 
 export function max<T>(i: T, j: T): T {

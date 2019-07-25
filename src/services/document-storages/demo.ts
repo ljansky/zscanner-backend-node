@@ -92,7 +92,7 @@ const DEMO_FOLDERS: DocumentFolder[] = [
 ];
 
 // JS:NOTE: No entry can have DocumentMode = 'foto', the Android FrontEnd crashes
-const DEMO_DOCUMENT_TYPES: DocumentType[] = [
+export const DEMO_DOCUMENT_TYPES: DocumentType[] = [
     {
         mode: 'doc',
         display: 'Rodný list',
