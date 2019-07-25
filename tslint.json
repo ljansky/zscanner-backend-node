@@ -19,6 +19,7 @@
     "no-empty-interface": false,
     "no-reference": false,
     "no-string-literal": false,
+    "no-unused-variable": true,
     "interface-name": false,
     "member-ordering": [true, "public-before-private", "variables-before-functions"],
     "variable-name": false,

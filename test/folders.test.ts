@@ -1,6 +1,6 @@
 import request = require('supertest');
 
-import { newDemoDocumentStorage, DEMO_DOCUMENT_TYPES } from "../src/services/document-storages/demo";
+import { newDemoDocumentStorage } from "../src/services/document-storages/demo";
 import { DocumentFolder } from "../src/services/types";
 
 import { withApplication } from "./common";
