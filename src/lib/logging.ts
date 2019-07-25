@@ -11,6 +11,11 @@ export function createLogger(fileName: string) {
     return globalLogger.child({ fileName });
 }
 
+export function disableLogging() {
+    globalLogger.transports.forEach((t) => globalLogger.remove(t));
+    globalLogger.add(new (require("winston-null").NullTransport)());
+}
+
 const globalLogger = constructLogger();
 
 function constructLogger() {

@@ -52,8 +52,6 @@ export function newDocumentsRouter(
   async function postSummaryV3(ctx: koa.Context) {
     const body = ctx.request.body;
 
-    console.log(body, moment(body.datetime));
-
     if (!body) { return error('No body in the request'); }
     if (!body.correlation) { return error('No correlation in the request'); }
     if (!body.folderInternalId) { return error('No folderInternalId in the request'); }
