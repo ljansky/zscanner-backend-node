@@ -1,7 +1,10 @@
 import * as koa from 'koa';
 import * as rp from 'request-promise';
 
+import { createLogger } from "../../lib/logging";
 import { Authenticator, HEALTH_LEVEL_OK } from "../types";
+
+const LOG = createLogger(__filename);
 
 export function newSeacatAuthenticator(
     {
@@ -52,6 +55,7 @@ export function newSeacatAuthenticator(
         try {
             res = await rp.get(options);
         } catch (err) {
+            LOG.error(`Error requesting seacat response`, err);
             return authFail();
         }
 

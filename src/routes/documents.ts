@@ -26,6 +26,8 @@ export function newDocumentsRouter(
   router.post('/v3/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
   router.post('/v3/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV3));
 
+  return router;
+
   async function postPage(ctx: koa.Context) {
     if (ctx.request.type !== `multipart/form-data`) { return error('Not multipart/form-data'); }
     const body = ctx.request.body;
@@ -56,7 +58,7 @@ export function newDocumentsRouter(
     if (!body.correlation) { return error('No correlation in the request'); }
     if (!body.folderInternalId) { return error('No folderInternalId in the request'); }
     if (!body.documentMode) { return error('No documentMode in the request'); }
-    if (!body.documentType) { return error('No documentType in the request'); }
+    if (!body.documentType && body.documentType !== '') { return error('No documentType in the request'); }
     if (!body.pages || !parseInt(body.pages, 10)) { return error('No pages in the request'); }
     if (!body.datetime || !moment(body.datetime).isValid()) { return error('No valid datetime in the request'); }
 
@@ -115,6 +117,4 @@ export function newDocumentsRouter(
       ctx.response.message = message;
     }
   }
-
-  return router;
 }

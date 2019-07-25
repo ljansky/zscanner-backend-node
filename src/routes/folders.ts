@@ -24,6 +24,8 @@ export function newFoldersRouter(
     router.get('/v3/folders/search', wrapRouteWithErrorHandler(LOG, getFoldersV3));
     router.get('/v3/folders/decode', wrapRouteWithErrorHandler(LOG, getFolderByBarcodeV3));
 
+    return router;
+
     async function getPatientsV1V2(ctx: koa.Context) {
         const query = sanitizeQuery(ctx.query.query);
         const folders = query ? await documentStorage.findFolders(query) : [];
@@ -61,8 +63,6 @@ export function newFoldersRouter(
             ctx.response.status = 404;
         }
     }
-
-    return router;
 }
 
 function DocumentFolder2Patient(folder: DocumentFolder): Patient {

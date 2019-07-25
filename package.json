@@ -15,7 +15,7 @@
     "tslint": "npx tslint --project .",
     "ts-start": "npx ts-node src/index",
     "ts-demo": "env ZSCANNER_AUTHENTICATOR=noop ZSCANNER_STORAGE=demo npx ts-node src/index",
-    "test": "npx jest",
+    "test": "npx jest --coverage",
     "prepare": "npm run build-ts"
   },
   "husky": {

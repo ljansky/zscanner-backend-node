@@ -24,7 +24,7 @@ describe("Folders/patients tests", () => {
         });
     });
 
-    test(`Check that patient search /v3/folders/search bubbles to document storage and returns correct result`, async () => {
+    test(`Check that folder search /v3/folders/search bubbles to document storage and returns correct result`, async () => {
         await withApplication({
             documentStorage: MOCK_DOCUMENT_STORAGE,
         }, async (server) => {
@@ -40,6 +40,33 @@ describe("Folders/patients tests", () => {
         });
     });
 
+    test(`Check that patient decode /v2 bubbles to document storage and returns correct result`, async () => {
+        await withApplication({
+            documentStorage: MOCK_DOCUMENT_STORAGE,
+        }, async (server) => {
+            const response = await request(server).get(`/api-zscanner/v2/patients/decode?query=QUERY`);
+            expect(response.status).toEqual(200);
+            expect(response.body).toEqual({
+                bid: 'EXTERNAL-ID',
+                zid: 'QUERY',
+                name: 'THE-NAME',
+            });
+        });
+    });
+
+    test(`Check that folders decode /v3 bubbles to document storage and returns correct result`, async () => {
+        await withApplication({
+            documentStorage: MOCK_DOCUMENT_STORAGE,
+        }, async (server) => {
+            const response = await request(server).get(`/api-zscanner/v3/folders/decode?query=QUERY`);
+            expect(response.status).toEqual(200);
+            expect(response.body).toEqual({
+                externalId: 'EXTERNAL-ID',
+                internalId: 'QUERY',
+                name: 'THE-NAME',
+            });
+        });
+    });
 });
 
 const MOCK_DOCUMENT_STORAGE = {
@@ -53,5 +80,12 @@ const MOCK_DOCUMENT_STORAGE = {
                 internalId: 'INTERNAL-ID',
             },
         ];
+    },
+    async getFolderByBarcode(folderBarcode: string): Promise<DocumentFolder | undefined> {
+        return {
+            name: "THE-NAME",
+            externalId: "EXTERNAL-ID",
+            internalId: folderBarcode,
+        };
     },
 };

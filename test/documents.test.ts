@@ -4,13 +4,14 @@ import request = require('supertest');
 import { newDemoDocumentStorage } from "../src/services/document-storages/demo";
 import { DocumentSummary } from "../src/services/types";
 
-import { withApplication } from "./common";
+import { newStaticAuthenticator, withApplication } from "./common";
 
 describe("Documents tests", () => {
     ["/v1", "/v2"].forEach((path) => {
         test(`Check that document summary upload ${path} bubbles to document storage and returns correct result`, async () => {
             const storage = newMockDocumentStorage();
             await withApplication({
+                authenticator: newStaticAuthenticator(),
                 documentStorage: storage,
             }, async (server) => {
                 const response = await request(server)
@@ -36,7 +37,7 @@ describe("Documents tests", () => {
                             name: "NAME",
                             notes: "NOTES",
                             pages: 1,
-                            user: undefined,
+                            user: "USER",
                         },
                     },
                 ]);
@@ -47,6 +48,7 @@ describe("Documents tests", () => {
     test(`Check that document summary upload /v3 bubbles to document storage and returns correct result`, async () => {
         const storage = newMockDocumentStorage();
         await withApplication({
+            authenticator: newStaticAuthenticator(),
             documentStorage: storage,
         }, async (server) => {
             const response = await request(server)
@@ -56,7 +58,7 @@ describe("Documents tests", () => {
                     correlation: 'CORRELATION',
                     folderInternalId: 'PATID',
                     documentMode: "doc",
-                    documentType:  'TYPE',
+                    documentType:  '',
                     pages: 1,
                     datetime: "2000-01-01T12:30:00Z",
                     name: 'NAME',
@@ -70,12 +72,12 @@ describe("Documents tests", () => {
                     summary: {
                         datetime: Date.UTC(2000, 0, 1, 12, 30),
                         documentMode: "doc",
-                        documentType: "TYPE",
+                        documentType: "",
                         folderInternalId: "PATID",
                         name: "NAME",
                         notes: "NOTES",
                         pages: 1,
-                        user: undefined,
+                        user: "USER",
                     },
                 },
             ]);

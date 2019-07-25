@@ -19,6 +19,8 @@ export function newHealthCheckRouter(
     router.get('/v2/healthcheck', healthcheck);
     router.get('/v3/healthcheck', healthcheck);
 
+    return router;
+
     async function healthcheck(ctx: koa.Context) {
         const totalHealth = components
             .map((c) => c.getHealth())
@@ -38,6 +40,4 @@ export function newHealthCheckRouter(
             };
         }
     }
-
-    return router;
 }
