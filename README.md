@@ -1,5 +1,7 @@
 # zScanner
 
+[![build status](https://travis-ci.org/ikem-cz/zscanner-backend-node.svg?branch=master)](https://travis-ci.org/ikem-cz/zscanner-backend-node)
+
 ## API
 
 ### Request Document Types
