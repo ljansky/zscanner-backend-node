@@ -11,4 +11,6 @@ export const config = {
 
     AUTHENTICATOR: process.env.ZSCANNER_AUTHENTICATOR || 'none',
     DOCUMENT_STORAGE: process.env.ZSCANNER_STORAGE || 'demo',
+
+    ROUTER_PREFIX: process.env.ROUTER_PREFIX || '/api-zscanner',
 };

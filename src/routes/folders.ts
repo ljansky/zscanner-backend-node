@@ -1,6 +1,7 @@
 import * as koa from 'koa';
 import { default as KoaRouter } from 'koa-router';
 
+import { config } from "../lib/config";
 import { createLogger } from "../lib/logging";
 import { wrapRouteWithErrorHandler } from "../lib/utils";
 import { DocumentFolder, DocumentStorage, Patient } from "../services/types";
@@ -16,7 +17,7 @@ export function newFoldersRouter(
 
     const router = new KoaRouter();
 
-    router.prefix('/api-zscanner/');
+    router.prefix(config.ROUTER_PREFIX);
 
     router.get('/v1/patients', wrapRouteWithErrorHandler(LOG, getPatientsV1V2));
     router.get('/v2/patients/search', wrapRouteWithErrorHandler(LOG, getPatientsV1V2));

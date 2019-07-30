@@ -2,6 +2,7 @@ import * as koa from 'koa';
 import { default as KoaRouter } from 'koa-router';
 import { default as moment } from 'moment';
 
+import { config } from "../lib/config";
 import { createLogger } from "../lib/logging";
 import { wrapRouteWithErrorHandler } from "../lib/utils";
 import { DocumentStorage, DocumentSummary } from "../services/types";
@@ -17,7 +18,7 @@ export function newDocumentsRouter(
 
   const router = new KoaRouter();
 
-  router.prefix('/api-zscanner');
+  router.prefix(config.ROUTER_PREFIX);
 
   router.post('/v1/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
   router.post('/v1/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV1V2));

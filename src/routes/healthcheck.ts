@@ -1,6 +1,7 @@
 import * as koa from 'koa';
 import { default as KoaRouter } from 'koa-router';
 
+import { config } from "../lib/config";
 import { max } from "../lib/utils";
 import { HealthConscious, HEALTH_LEVEL_ERROR, HEALTH_LEVEL_OK } from "../services/types";
 
@@ -12,7 +13,7 @@ export function newHealthCheckRouter(
     }) {
     const router = new KoaRouter();
 
-    router.prefix('/api-zscanner');
+    router.prefix(config.ROUTER_PREFIX);
 
     router.get('/healthcheck', healthcheck);
     router.get('/v1/healthcheck', healthcheck);
