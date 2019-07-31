@@ -1,9 +1,10 @@
-import { constructKoaApplication } from "./app";
+import { constructKoaApplication, MetricsStorage } from "./app";
 import { config } from './lib/config';
 import { createLogger } from "./lib/logging";
 import { newNoopAuthenticator } from "./services/authenticators/noop";
 import { newSeacatAuthenticator } from "./services/authenticators/seacat";
 import { newDemoDocumentStorage } from "./services/document-storages/demo";
+import { newNoopMetricsStorage } from "./services/metrics-storages/noop";
 import { Authenticator, DocumentStorage } from "./services/types";
 
 const LOG = createLogger(__filename);
@@ -22,9 +23,13 @@ async function start() {
     const documentStorage = constructDocumentStorage();
     await documentStorage.initialize();
 
+    const metricsStorage = constructMetricsStorage();
+    await metricsStorage.initialize();
+
     const app = constructKoaApplication({
         authenticator,
         documentStorage,
+        metricsStorage,
     });
 
     app.listen(config.PORT, () => LOG.info(`Listening on port ${config.PORT}...`));
@@ -48,4 +53,8 @@ function constructAuthenticator(): Authenticator {
 
 function constructDocumentStorage(): DocumentStorage {
     return newDemoDocumentStorage({});
+}
+
+function constructMetricsStorage(): MetricsStorage {
+    return newNoopMetricsStorage();
 }
