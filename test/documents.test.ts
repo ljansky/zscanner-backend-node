@@ -4,15 +4,17 @@ import request = require('supertest');
 import { newDemoDocumentStorage } from "../src/services/document-storages/demo";
 import { DocumentSummary } from "../src/services/types";
 
-import { newStaticAuthenticator, withApplication } from "./common";
+import { newMockMetricsStorage, newStaticAuthenticator, withApplication } from "./common";
 
 describe("Documents tests", () => {
     ["/v1", "/v2"].forEach((path) => {
         test(`Check that document summary upload ${path} bubbles to document storage and returns correct result`, async () => {
-            const storage = newMockDocumentStorage();
+            const documentStorage = newMockDocumentStorage();
+            const metricsStorage = newMockMetricsStorage();
             await withApplication({
                 authenticator: newStaticAuthenticator(),
-                documentStorage: storage,
+                documentStorage,
+                metricsStorage,
             }, async (server) => {
                 const response = await request(server)
                     .post(`/api-zscanner${path}/documents/summary`)
@@ -25,8 +27,8 @@ describe("Documents tests", () => {
                     .field("name", 'NAME')
                     .field("notes", 'NOTES');
                 expect(response.status).toEqual(200);
-                expect(storage.postedPages.length).toEqual(0);
-                expect(storage.postedSummaries).toEqual([
+                expect(documentStorage.postedPages.length).toEqual(0);
+                expect(documentStorage.postedSummaries).toEqual([
                     {
                         correlationId: "CORRELATION",
                         summary: {
@@ -41,15 +43,29 @@ describe("Documents tests", () => {
                         },
                     },
                 ]);
+
+                metricsStorage.expectEvent({
+                    ts: new Date(),
+                    type: "upload",
+                    version: path === '/v2' ? 2 : 1,
+                    user: 'USER',
+                    data: {
+                        mode: 'doc',
+                        type: 'TYPE',
+                        pages: 1,
+                    },
+                });
             });
         });
     });
 
     test(`Check that document summary upload /v3 bubbles to document storage and returns correct result`, async () => {
-        const storage = newMockDocumentStorage();
+        const documentStorage = newMockDocumentStorage();
+        const metricsStorage = newMockMetricsStorage();
         await withApplication({
             authenticator: newStaticAuthenticator(),
-            documentStorage: storage,
+            documentStorage,
+            metricsStorage,
         }, async (server) => {
             const response = await request(server)
                 .post(`/api-zscanner/v3/documents/summary`)
@@ -65,8 +81,8 @@ describe("Documents tests", () => {
                     notes: 'NOTES',
                 });
             expect(response.status).toEqual(200);
-            expect(storage.postedPages.length).toEqual(0);
-            expect(storage.postedSummaries).toEqual([
+            expect(documentStorage.postedPages.length).toEqual(0);
+            expect(documentStorage.postedSummaries).toEqual([
                 {
                     correlationId: "CORRELATION",
                     summary: {
@@ -81,6 +97,18 @@ describe("Documents tests", () => {
                     },
                 },
             ]);
+
+            metricsStorage.expectEvent({
+                ts: new Date(),
+                type: "upload",
+                version: 3,
+                user: 'USER',
+                data: {
+                    mode: 'doc',
+                    type: '',
+                    pages: 1,
+                },
+            });
         });
     });
 

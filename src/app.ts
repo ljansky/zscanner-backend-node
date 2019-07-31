@@ -8,13 +8,14 @@ import { newDocumentsRouter } from "./routes/documents";
 import { newDocumentTypesRouter } from "./routes/documenttypes";
 import { newFoldersRouter } from "./routes/folders";
 import { newHealthCheckRouter } from "./routes/healthcheck";
-import { Authenticator, DocumentStorage } from "./services/types";
+import { Authenticator, DocumentStorage, MetricsStorage } from "./services/types";
 
 export { config } from "./lib/config";
 export { createLogger } from "./lib/logging";
 export * from "./lib/utils";
 export * from "./services/types";
 export { newNoopAuthenticator } from "./services/authenticators/noop";
+export { newNoopMetricsStorage } from "./services/metrics-storages/noop";
 export { newSeacatAuthenticator } from "./services/authenticators/seacat";
 export { newDemoDocumentStorage } from "./services/document-storages/demo";
 
@@ -27,9 +28,11 @@ export function constructKoaApplication(
     {
         authenticator,
         documentStorage,
+        metricsStorage,
     }: {
         authenticator: Authenticator,
         documentStorage: DocumentStorage,
+        metricsStorage: MetricsStorage,
     }) {
 
     const app = new Koa();
@@ -38,10 +41,10 @@ export function constructKoaApplication(
     return app;
 
     function configureRoutes() {
-        const documentsRouter = newDocumentsRouter({ documentStorage });
-        const foldersRouter = newFoldersRouter({ documentStorage });
+        const documentsRouter = newDocumentsRouter({ documentStorage, metricsStorage });
+        const foldersRouter = newFoldersRouter({ documentStorage, metricsStorage });
         const documentTypesRouter = newDocumentTypesRouter({ documentStorage });
-        const healthCheckRouter = newHealthCheckRouter({ components: [documentStorage, authenticator] });
+        const healthCheckRouter = newHealthCheckRouter({ components: [documentStorage, authenticator, metricsStorage] });
 
         app.use(documentsRouter.routes());
         app.use(foldersRouter.routes());

@@ -31,6 +31,12 @@ export interface DocumentStorage extends HealthConscious {
     submitDocumentSummary(correlationId: string, summary: DocumentSummary): Promise<void>;
 }
 
+export interface MetricsStorage extends HealthConscious {
+    initialize(): Promise<void>;
+
+    log(event: MetricsEvent): void;
+}
+
 export interface DocumentFolder {
     externalId: string;
     internalId: string;
@@ -71,4 +77,37 @@ export interface PatientDocumentSummary {
     name: string;
     notes: string;
     user: string;
+}
+
+export type MetricsEvent = DocumentSummaryUploadMetricsEvent | DocumentFolderQueryMetricsEvent | DocumentFolderDecodeMetricsEvent;
+
+interface BaseMetricsEvent {
+    ts: Date;
+    type: string;
+    version: number;
+    data: any;
+    user: string;
+}
+
+interface DocumentSummaryUploadMetricsEvent extends BaseMetricsEvent {
+    type: 'upload';
+    data: {
+        mode: DocumentMode;
+        type: string;
+        pages: number;
+    };
+}
+
+interface DocumentFolderQueryMetricsEvent extends BaseMetricsEvent {
+    type: 'search';
+    data: {
+        query: string;
+    };
+}
+
+interface DocumentFolderDecodeMetricsEvent extends BaseMetricsEvent {
+    type: 'decode';
+    data: {
+        query: string;
+    };
 }
