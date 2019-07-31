@@ -90,7 +90,7 @@ export function newDocumentsRouter(
         }
 
         metricsStorage.log({
-            ts: Date.now(),
+            ts: new Date(),
             type: "upload",
             version: 3,
             user: ctx.state.userId,
@@ -152,7 +152,7 @@ export function newDocumentsRouter(
         }
 
         metricsStorage.log({
-            ts: Date.now(),
+            ts: new Date(),
             type: "upload",
             version: ctx.request.path.includes('/v2/') ? 2 : 1,
             user: ctx.state.userId,

@@ -45,7 +45,7 @@ describe("Documents tests", () => {
                 ]);
 
                 metricsStorage.expectEvent({
-                    ts: NaN,
+                    ts: new Date(),
                     type: "upload",
                     version: path === '/v2' ? 2 : 1,
                     user: 'USER',
@@ -99,7 +99,7 @@ describe("Documents tests", () => {
             ]);
 
             metricsStorage.expectEvent({
-                ts: NaN,
+                ts: new Date(),
                 type: "upload",
                 version: 3,
                 user: 'USER',

@@ -82,7 +82,7 @@ export interface PatientDocumentSummary {
 export type MetricsEvent = DocumentSummaryUploadMetricsEvent | DocumentFolderQueryMetricsEvent | DocumentFolderDecodeMetricsEvent;
 
 interface BaseMetricsEvent {
-    ts: number;
+    ts: Date;
     type: string;
     version: number;
     data: any;

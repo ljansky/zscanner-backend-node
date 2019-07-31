@@ -33,7 +33,7 @@ export function newMockMetricsStorage(): MetricsStorage & { expectEvent(event: M
         getHealth: () => ({ level: HEALTH_LEVEL_OK, messages: [] }),
         expectEvent: (event) => {
             expect(events.length).toEqual(1);
-            expect(typeof events[0].ts).toEqual("number");
+            expect(events[0].ts).toBeInstanceOf(Date);
             event.ts = events[0].ts;
             expect(events[0]).toEqual(event);
         },

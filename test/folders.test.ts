@@ -25,7 +25,7 @@ describe("Folders/patients tests", () => {
                 ]);
 
                 metricsStorage.expectEvent({
-                    ts: NaN,
+                    ts: new Date(),
                     type: "search",
                     version: path.includes('/v2') ? 2 : 1,
                     user: 'USER',
@@ -55,7 +55,7 @@ describe("Folders/patients tests", () => {
             ]);
 
             metricsStorage.expectEvent({
-                ts: NaN,
+                ts: new Date(),
                 type: "search",
                 version: 3,
                 user: 'USER',
@@ -84,7 +84,7 @@ describe("Folders/patients tests", () => {
             ]);
 
             metricsStorage.expectEvent({
-                ts: NaN,
+                ts: new Date(),
                 type: "search",
                 version: 1,
                 user: 'USER',
@@ -111,7 +111,7 @@ describe("Folders/patients tests", () => {
             });
 
             metricsStorage.expectEvent({
-                ts: NaN,
+                ts: new Date(),
                 type: "decode",
                 version: 2,
                 user: 'USER',
@@ -138,7 +138,7 @@ describe("Folders/patients tests", () => {
             });
 
             metricsStorage.expectEvent({
-                ts: NaN,
+                ts: new Date(),
                 type: "decode",
                 version: 3,
                 user: 'USER',

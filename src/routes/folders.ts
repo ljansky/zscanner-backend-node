@@ -31,7 +31,7 @@ export function newFoldersRouter(
 
     async function getPatientsV1V2(ctx: koa.Context) {
         metricsStorage.log({
-            ts: Date.now(),
+            ts: new Date(),
             type: "search",
             version: ctx.request.path.includes('/v2/') ? 2 : 1,
             user: ctx.state.userId,
@@ -60,7 +60,7 @@ export function newFoldersRouter(
 
     async function getPatientByBarcodeV1V2(ctx: koa.Context) {
         metricsStorage.log({
-            ts: Date.now(),
+            ts: new Date(),
             type: "decode",
             version: ctx.request.path.includes('/v2/') ? 2 : 1,
             user: ctx.state.userId,
@@ -82,7 +82,7 @@ export function newFoldersRouter(
 
     async function getFoldersV3(ctx: koa.Context) {
         metricsStorage.log({
-            ts: Date.now(),
+            ts: new Date(),
             type: "search",
             version: 3,
             user: ctx.state.userId,
@@ -99,7 +99,7 @@ export function newFoldersRouter(
 
     async function getFolderByBarcodeV3(ctx: koa.Context) {
         metricsStorage.log({
-            ts: Date.now(),
+            ts: new Date(),
             type: "decode",
             version: 3,
             user: ctx.state.userId,
