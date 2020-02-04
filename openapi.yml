@@ -1,0 +1,208 @@
+openapi: 3.0.0
+info:
+  title: zScanner REST API
+  version: 3.0.0
+
+servers:
+  - url: https://tempra.ikem.cz/api/public/v1
+
+paths:
+  /v3/documenttypes:
+    get:
+      summary: Get available document types
+      operationId: getDocumentTypes
+      responses:
+        200:
+          description: |
+            List of available document types.
+            Note, that the phone can always send document mode of "foto" with empty document type
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocumentType'
+              example: 
+                [
+                  { "mode": "doc", "display": "Rodný list", type: "birthcertificate" },
+                  { "mode": "doc", "display": "Občanský průkaz", type: "nationalid" },
+                  { "mode": "exam", "display": "Výsledky analýzy krve", type: "blood-results" },
+                  { "mode": "exam", "display": "Výsledky RTG vyšetření", type: "rtg-results" }
+                ]
+
+  /v3/documents/summary:
+    post:
+      summary: Post summary of a set of photos
+      operationId: postSummary
+      description: |
+        This is a call sent by the phone to post a summary of the document being submitted.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentSummary"
+            examples:
+              enumeratedDocumentType:
+                description: "Typ dokumentu z číselníku"
+                value:
+                  {
+                    "correlation": "30ca99cc-af1b-4c41-bb83-d1a40a18e354",
+                    "folderInternalId": "788392",
+                    "documentMode": "doc",
+                    "documentType": "birthcertificate",
+                    "pages": 1,
+                    "datetime": "2000-01-02T12:34:12Z"
+                  }
+              genericPhoto:
+                description: "Obecná fotografie"
+                value:
+                  {
+                    "correlation": "39d4294a-0066-453d-9a97-53252574ec83",
+                    "folderInternalId": "788392",
+                    "documentMode": "foto",
+                    "documentType": "",
+                    "pages": 1,
+                    "datetime": "2000-01-02T12:34:12Z"
+                  }
+                  
+      responses:
+        200:
+          description: Summary posted successfully
+        400:
+          description: Error in request
+    
+  /v3/documents/page:
+    post:
+      summary: Post an individual page
+      operationId: postPage
+      description: |
+        This call is sent by the phone to post an individual page of the document being submitted.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                page:
+                  type: string
+                  format: binary
+                  description: Binary content of the image.
+                correlation:
+                  type: string
+                  description: Correlation ID referencing the document summary.
+                pageIndex:
+                  type: number
+                  description: Index of the page within the document. The first page has index 1.
+              required:
+                - page
+                - correlation
+                - pageIndex
+      responses:
+        200:
+          description: Page posted successfully
+        400:
+          description: Error in request
+                
+  /v3/folders/search:
+    get:
+      summary: Search for a folder via free text
+      operationId: findFolderByName
+      description: |
+        Phone calls this service repeatedly to get a list of suggestions for the list of folders
+        matching the free text query.
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of folders matching the free text query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocumentFolder'
+              example: 
+                [
+                  { "externalId": "925221/9449", "internalId": "124587112", "name": "Fiona Shreková" },
+                  { "externalId": "011116/0632", "internalId": "124587113", "name": "Šípková Růženka" }
+                ]
+            
+  /v3/folders/decode:
+    get:
+      summary: Get a folder by internalId
+      operationId: findFolderByInternalId
+      description: |
+        Phone calls this service once after a barcode is scanned.
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Folder matching the ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentFolder'
+              example:
+                { "externalId": "925221/9449", "internalId": "124587112", "name": "Fiona Shreková" }
+
+components:
+  schemas:
+    DocumentType:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum:
+          - doc
+          - exam
+        display:
+          type: string
+        type:
+          type: string
+    
+    DocumentSummary:
+      type: object
+      properties:
+        correlation:
+          type: string
+        folderInternalId:
+          type: string
+        documentMode:
+          type: string
+          enum:
+            - doc
+            - exam
+            - foto
+        documentType:
+          type: string
+        pages:
+          type: number
+        datetime:
+          type: string
+          format: date-time
+    
+
+    DocumentFolder:
+      type: object
+      properties:
+        externalId:
+          type: string
+        internalId:
+          type: string
+        name:
+          type: string
+      required:
+        - externalId
+        - internalId
+        - name
+

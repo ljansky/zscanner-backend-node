@@ -47,6 +47,9 @@ export function newDocumentsRouter(
         if (!body.correlation) {
             return error('No correlation in the request');
         }
+        if (body.pageIndex && isFinite(parseInt(body.pageIndex, 10))) {
+          body.page = body.pageIndex;
+        }
         if (!body.page || !isFinite(parseInt(body.page, 10))) {
             return error('No page in the request');
         }
