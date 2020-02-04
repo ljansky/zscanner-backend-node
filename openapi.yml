@@ -94,7 +94,7 @@ paths:
                   description: Correlation ID referencing the document summary.
                 pageIndex:
                   type: number
-                  description: Index of the page within the document. The first page has index 1.
+                  description: Index of the page within the document. The first page has index 0.
               required:
                 - page
                 - correlation
