@@ -14,7 +14,7 @@
     "tslint-fix": "npx tslint --project . --fix",
     "tslint": "npx tslint --project .",
     "ts-start": "npx ts-node src/index",
-    "ts-demo": "env ZSCANNER_AUTHENTICATOR=noop ZSCANNER_STORAGE=demo npx ts-node src/index",
+    "ts-demo": "env ZSCANNER_AUTHENTICATOR=noop ZSCANNER_STORAGE=demo DEBUG=tus-node-server npx ts-node src/index",
     "test": "npx jest --coverage",
     "prepare": "npm run build-ts"
   },
@@ -28,7 +28,9 @@
   ],
   "dependencies": {
     "debug": "^2.6.3",
+    "express-to-koa": "^2.0.0",
     "fresh": "^0.5.2",
+    "handlebars": ">=4.3.0",
     "koa": "^2.2.0",
     "koa-body": "^4.0.6",
     "koa-bodyparser": "^3.2.0",
@@ -45,12 +47,13 @@
     "pug": "^2.0.0-rc.1",
     "request": "^2.88.0",
     "request-promise": "^4.2.2",
+    "tus-node-server": "^0.3.2",
     "uuid": "^3.3.2",
-    "winston": "^3.2.1",
-    "handlebars": ">=4.3.0"
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@types/debug": "^4.1.4",
+    "@types/express-to-koa": "^1.0.0",
     "@types/fresh": "^0.5.0",
     "@types/jest": "^24.0.15",
     "@types/koa": "^2.0.49",

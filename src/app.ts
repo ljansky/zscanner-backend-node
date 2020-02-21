@@ -8,6 +8,7 @@ import { newDocumentsRouter } from "./routes/documents";
 import { newDocumentTypesRouter } from "./routes/documenttypes";
 import { newFoldersRouter } from "./routes/folders";
 import { newHealthCheckRouter } from "./routes/healthcheck";
+import { newUploadRouter } from "./routes/upload";
 import { Authenticator, DocumentStorage, MetricsStorage } from "./services/types";
 
 export { config } from "./lib/config";
@@ -29,10 +30,12 @@ export function constructKoaApplication(
         authenticator,
         documentStorage,
         metricsStorage,
+        uploader
     }: {
         authenticator: Authenticator,
         documentStorage: DocumentStorage,
         metricsStorage: MetricsStorage,
+        uploader: any
     }) {
 
     const app = new Koa();
@@ -45,17 +48,20 @@ export function constructKoaApplication(
         const foldersRouter = newFoldersRouter({ documentStorage, metricsStorage });
         const documentTypesRouter = newDocumentTypesRouter({ documentStorage });
         const healthCheckRouter = newHealthCheckRouter({ components: [documentStorage, authenticator, metricsStorage] });
+        const uploadRouter = newUploadRouter({ uploader });
 
         app.use(documentsRouter.routes());
         app.use(foldersRouter.routes());
         app.use(documentTypesRouter.routes());
         app.use(healthCheckRouter.routes());
+        app.use(uploadRouter.routes());
     }
 
     function configureMiddleware() {
         onerror(app);
 
         app.use(async function(ctx: Koa.Context, next: KoaNextFunction) {
+            console.log('AUTH MIDDLEWARE', ctx.path);
             if (ctx.path.endsWith("/healthcheck")
                 || !ctx.path.startsWith("/api-zscanner")
                 || await authenticator.authenticate(ctx)) {
@@ -65,11 +71,11 @@ export function constructKoaApplication(
                 ctx.response.message = "Access Denied";
             }
         });
-
-        app.use(formidable({
+        
+        /*app.use(formidable({
             encoding: 'utf-8',
             maxFileSize: 1000 * 1024 * 1024,
-        }));
+        }));*/
         app.use(bodyparser({
             enableTypes: ['json', 'form', 'text'],
         }));
