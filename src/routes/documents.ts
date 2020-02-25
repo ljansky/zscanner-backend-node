@@ -26,16 +26,16 @@ export function newDocumentsRouter(
 
     router.prefix(config.ROUTER_PREFIX);
 
-    router.use(formidable({
+    const formidableMiddleware = formidable({
         encoding: 'utf-8',
         maxFileSize: 1000 * 1024 * 1024,
-    }));
+    });
 
-    router.post('/v1/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
-    router.post('/v1/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
-    router.post('/v2/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
-    router.post('/v2/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
-    router.post('/v3/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
+    router.post('/v1/documents/page', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postPage));
+    router.post('/v1/documents/summary', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
+    router.post('/v2/documents/page', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postPage));
+    router.post('/v2/documents/summary', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
+    router.post('/v3/documents/page', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postPage));
     router.post('/v3/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV3));
 
     uploader.onUploadComplete('page', uploadPage);
