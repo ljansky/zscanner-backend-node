@@ -111,3 +111,15 @@ interface DocumentFolderDecodeMetricsEvent extends BaseMetricsEvent {
         query: string;
     };
 }
+
+export interface TusEvent {
+    file: {
+        id: string;
+        upload_length: string;
+        upload_metadata: string;
+    };
+}
+
+interface TusUploaderMetadata {}
+
+export type TusUploaderEventHandler = (metadata: TusUploaderMetadata) => void;

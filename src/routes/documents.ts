@@ -7,20 +7,29 @@ import { createLogger } from "../lib/logging";
 import { wrapRouteWithErrorHandler } from "../lib/utils";
 import { DocumentStorage, DocumentSummary, MetricsStorage } from "../services/types";
 
+const formidable = require('koa2-formidable');
+
 const LOG = createLogger(__filename);
 
 export function newDocumentsRouter(
     {
         documentStorage,
         metricsStorage,
+        uploader,
     }: {
         documentStorage: DocumentStorage,
         metricsStorage: MetricsStorage,
+        uploader: any,
     }) {
 
     const router = new KoaRouter();
 
     router.prefix(config.ROUTER_PREFIX);
+
+    router.use(formidable({
+        encoding: 'utf-8',
+        maxFileSize: 1000 * 1024 * 1024,
+    }));
 
     router.post('/v1/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
     router.post('/v1/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
@@ -29,7 +38,13 @@ export function newDocumentsRouter(
     router.post('/v3/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
     router.post('/v3/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV3));
 
+    uploader.onUploadComplete('page', uploadPage);
+
     return router;
+
+    async function uploadPage(metadata: any) {
+        console.log('ON UPLOAD COMPLETE', metadata);
+    }
 
     async function postPage(ctx: koa.Context) {
         if (ctx.request.type !== `multipart/form-data`) {

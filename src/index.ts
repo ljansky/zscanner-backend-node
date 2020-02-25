@@ -5,8 +5,8 @@ import { newNoopAuthenticator } from "./services/authenticators/noop";
 import { newSeacatAuthenticator } from "./services/authenticators/seacat";
 import { newDemoDocumentStorage } from "./services/document-storages/demo";
 import { newNoopMetricsStorage } from "./services/metrics-storages/noop";
-import { newTusUploader } from "./services/uploader/tus-uploader";
 import { Authenticator, DocumentStorage } from "./services/types";
+import { newTusUploader } from "./services/uploader/tus-uploader";
 
 const LOG = createLogger(__filename);
 
@@ -33,7 +33,7 @@ async function start() {
         authenticator,
         documentStorage,
         metricsStorage,
-        uploader
+        uploader,
     });
 
     app.listen(config.PORT, () => LOG.info(`Listening on port ${config.PORT}...`));
