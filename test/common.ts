@@ -1,5 +1,6 @@
 import { Server } from "http";
 import * as koa from "koa";
+import { DataStore, EVENTS } from 'tus-node-server';
 
 import {
     constructKoaApplication,
@@ -41,6 +42,35 @@ export function newMockMetricsStorage(): MetricsStorage & { expectEvent(event: M
     };
 }
 
+class MockStore extends DataStore {
+    public files: any[] = [];
+    public create(req: any) {
+        return super.create(req)
+            .then((file) => {
+                this.files.push(file);
+                return file;
+            });
+    }
+    public write(req: any, file_id: string) {
+        return new Promise((resolve, reject) => {
+            const file = this.files.find((f) => f.id === file_id);
+            // Stub resolve for tests
+            const offset = 0;
+
+            this.emit(EVENTS.EVENT_UPLOAD_COMPLETE, { file });
+            return resolve(offset);
+        });
+    }
+}
+
+export function newMockTusUploader() {
+    return newTusUploader({
+        store: new MockStore({
+            path: '/api-zscanner/upload',
+        }),
+    });
+}
+
 export async function withApplication<T>(
     {
         authenticator,
@@ -62,7 +92,7 @@ export async function withApplication<T>(
     authenticator = authenticator || newNoopAuthenticator();
     documentStorage = documentStorage || newDemoDocumentStorage({});
     metricsStorage = metricsStorage || newNoopMetricsStorage();
-    uploader = uploader || newTusUploader();
+    uploader = uploader || newMockTusUploader();
     await authenticator.initialize();
     await documentStorage.initialize();
     await metricsStorage.initialize();

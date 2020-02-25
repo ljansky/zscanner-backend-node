@@ -5,8 +5,8 @@ import { newNoopAuthenticator } from "./services/authenticators/noop";
 import { newSeacatAuthenticator } from "./services/authenticators/seacat";
 import { newDemoDocumentStorage } from "./services/document-storages/demo";
 import { newNoopMetricsStorage } from "./services/metrics-storages/noop";
-import { Authenticator, DocumentStorage } from "./services/types";
-import { newTusUploader } from "./services/uploader/tus-uploader";
+import { Authenticator, DocumentStorage, Uploader } from "./services/types";
+import { newTusStore, newTusUploader } from "./services/uploader/tus-uploader";
 
 const LOG = createLogger(__filename);
 
@@ -63,6 +63,11 @@ function constructMetricsStorage(): MetricsStorage {
     return newNoopMetricsStorage();
 }
 
-function constructUploader(): any {
-    return newTusUploader();
+function constructUploader(): Uploader {
+    return newTusUploader({
+        store: newTusStore({
+            path: '/upload',
+            directory: config.UPLOADER_DIRECTORY,
+        }),
+    });
 }

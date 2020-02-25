@@ -1,5 +1,5 @@
 import e2k from 'express-to-koa';
-import { EVENTS, FileStore, Server } from 'tus-node-server';
+import { DataStore, EVENTS, FileStore, Server } from 'tus-node-server';
 
 import { config } from "../../lib/config";
 import { TusUploaderEventHandler, TusUploaderMetadata, Uploader } from '../types';
@@ -8,18 +8,32 @@ interface TusUploaderEventHandlers {
     [uploadType: string]: TusUploaderEventHandler;
 }
 
-export function newTusUploader(): Uploader {
+export function newTusStore({
+    directory,
+    path = '/upload',
+}: {
+    directory?: string;
+    path?: string;
+}): DataStore {
+    return new FileStore({
+        directory,
+        path: `${config.ROUTER_PREFIX}${path}`,
+    });
+}
+
+export function newTusUploader({
+    store,
+}: {
+    store: DataStore,
+}): Uploader {
 
     const tusServer = new Server();
-    tusServer.datastore = new FileStore({
-            directory: 'upload',
-            path: `${config.ROUTER_PREFIX}/upload`,
-    });
+    tusServer.datastore = store;
 
     const handlers: TusUploaderEventHandlers = {};
 
     tusServer.on(EVENTS.EVENT_UPLOAD_COMPLETE, (event) => {
-        const metadataList = event.file.upload_metadata
+        const metadataList = event.file ? event.file.upload_metadata
             .split(',')
             .map((m: string) => {
                 const [name, encodedValue] = m.split(' ');
@@ -27,7 +41,7 @@ export function newTusUploader(): Uploader {
                     name,
                     value: Buffer.from(encodedValue, 'base64').toString(),
                 };
-            });
+            }) : [];
 
         const metadata: TusUploaderMetadata = metadataList.reduce((acc, curr) => ({
             ...acc,

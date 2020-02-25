@@ -3,9 +3,8 @@ import { Server } from "http";
 import request = require('supertest');
 
 import { TusUploaderMetadata } from '../src/services/types';
-import { newTusUploader } from "../src/services/uploader/tus-uploader";
 
-import { withApplication } from "./common";
+import { newMockTusUploader, withApplication } from "./common";
 
 const testTusUploadClient = (server: Server) => ({
     create: async ({ url, data, metadata }: { url: string; data: Buffer; metadata: TusUploaderMetadata }) => {
@@ -35,7 +34,7 @@ const testTusUploadClient = (server: Server) => ({
 
 describe("Uploader", () => {
     test(`Check that upload handler is called after finished upload with uploadType in metadata`, async () => {
-        const uploader = newTusUploader();
+        const uploader = newMockTusUploader();
         const uploadHandler = jest.fn();
         uploader.onUploadComplete('test', uploadHandler);
         await withApplication({

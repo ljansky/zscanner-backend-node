@@ -16,8 +16,13 @@ declare module 'tus-node-server' {
         datastore: FileStore;
     }
 
-    export class FileStore {
+    export class FileStore extends DataStore {
         constructor (options: any);
+    }
+
+    export class DataStore extends EventEmitter {
+        constructor (options: any);
+        create(req: any): Promise<any>;
     }
 
     export enum EVENTS {
