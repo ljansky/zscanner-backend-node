@@ -9,7 +9,7 @@ import { newDocumentTypesRouter } from "./routes/documenttypes";
 import { newFoldersRouter } from "./routes/folders";
 import { newHealthCheckRouter } from "./routes/healthcheck";
 import { newUploadRouter } from "./routes/upload";
-import { Authenticator, DocumentStorage, MetricsStorage } from "./services/types";
+import { Authenticator, DocumentStorage, MetricsStorage, Uploader } from "./services/types";
 
 export { config } from "./lib/config";
 export { createLogger } from "./lib/logging";
@@ -34,7 +34,7 @@ export function constructKoaApplication(
         authenticator: Authenticator,
         documentStorage: DocumentStorage,
         metricsStorage: MetricsStorage,
-        uploader: any,
+        uploader: Uploader,
     }) {
 
     const app = new Koa();
@@ -60,7 +60,6 @@ export function constructKoaApplication(
         onerror(app);
 
         app.use(async function(ctx: Koa.Context, next: KoaNextFunction) {
-            console.log('AUTH MIDDLEWARE', ctx.path);
             if (ctx.path.endsWith("/healthcheck")
                 || !ctx.path.startsWith("/api-zscanner")
                 || await authenticator.authenticate(ctx)) {

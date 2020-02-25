@@ -5,7 +5,7 @@ import { default as moment } from 'moment';
 import { config } from "../lib/config";
 import { createLogger } from "../lib/logging";
 import { wrapRouteWithErrorHandler } from "../lib/utils";
-import { DocumentStorage, DocumentSummary, MetricsStorage } from "../services/types";
+import { DocumentStorage, DocumentSummary, MetricsStorage, TusUploaderMetadata, Uploader } from "../services/types";
 
 const formidable = require('koa2-formidable');
 
@@ -19,7 +19,7 @@ export function newDocumentsRouter(
     }: {
         documentStorage: DocumentStorage,
         metricsStorage: MetricsStorage,
-        uploader: any,
+        uploader: Uploader,
     }) {
 
     const router = new KoaRouter();
@@ -42,7 +42,7 @@ export function newDocumentsRouter(
 
     return router;
 
-    async function uploadPage(metadata: any) {
+    async function uploadPage(metadata: TusUploaderMetadata) {
         console.log('ON UPLOAD COMPLETE', metadata);
     }
 

@@ -10,7 +10,8 @@ import {
 } from "../src/app";
 import { disableLogging } from "../src/lib/logging";
 import { newNoopMetricsStorage } from "../src/services/metrics-storages/noop";
-import { Authenticator, DocumentStorage } from "../src/services/types";
+import { Authenticator, DocumentStorage, Uploader } from "../src/services/types";
+import { newTusUploader } from "../src/services/uploader/tus-uploader";
 
 disableLogging();
 
@@ -45,12 +46,14 @@ export async function withApplication<T>(
         authenticator,
         documentStorage,
         metricsStorage,
+        uploader,
         patcher,
         port,
     }: {
         authenticator?: Authenticator,
         documentStorage?: DocumentStorage,
         metricsStorage?: MetricsStorage,
+        uploader?: Uploader,
         patcher?: (app: koa) => void,
         port?: number,
     },
@@ -59,6 +62,7 @@ export async function withApplication<T>(
     authenticator = authenticator || newNoopAuthenticator();
     documentStorage = documentStorage || newDemoDocumentStorage({});
     metricsStorage = metricsStorage || newNoopMetricsStorage();
+    uploader = uploader || newTusUploader();
     await authenticator.initialize();
     await documentStorage.initialize();
     await metricsStorage.initialize();
@@ -66,6 +70,7 @@ export async function withApplication<T>(
         authenticator,
         documentStorage,
         metricsStorage,
+        uploader,
     });
     if (patcher) {
         patcher(app);

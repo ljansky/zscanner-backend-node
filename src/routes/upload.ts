@@ -1,11 +1,12 @@
 import { default as KoaRouter } from 'koa-router';
 
 import { config } from "../lib/config";
+import { Uploader } from '../services/types';
 
 export function newUploadRouter({
     uploader,
 }: {
-    uploader: any,
+    uploader: Uploader,
 }) {
     const router = new KoaRouter();
 

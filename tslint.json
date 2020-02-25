@@ -41,6 +41,7 @@
         "grouped-imports": true
       }
     ],
-    "prefer-object-spread": false
+    "prefer-object-spread": false,
+    "indent": [true, "spaces", 4]
   }
 }
