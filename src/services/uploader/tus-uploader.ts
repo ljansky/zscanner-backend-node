@@ -47,6 +47,8 @@ export function newTusUploader({
             ...acc,
             [curr.name]: curr.value,
         }), {});
+        // TODO: set the filepath in better way (to have app root dir in config?)
+        metadata.filepath = `${__dirname}/../../../upload/${event.file.id}`;
 
         if (metadata.uploadType && handlers[metadata.uploadType]) {
             handlers[metadata.uploadType](metadata);

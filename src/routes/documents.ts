@@ -43,7 +43,9 @@ export function newDocumentsRouter(
     return router;
 
     async function uploadPage(metadata: TusUploaderMetadata) {
-        console.log('ON UPLOAD COMPLETE', metadata);
+        const correlation = metadata.correlation;
+        const pageIndex = parseInt(metadata.pageIndex, 10);
+        await documentStorage.submitDocumentPage(correlation, pageIndex, metadata.filepath);
     }
 
     async function postPage(ctx: koa.Context) {
