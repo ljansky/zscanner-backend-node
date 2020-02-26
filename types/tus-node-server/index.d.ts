@@ -23,6 +23,8 @@ declare module 'tus-node-server' {
     export class DataStore extends EventEmitter {
         constructor (options: any);
         create(req: any): Promise<any>;
+        path: string;
+        directory: string;
     }
 
     export enum EVENTS {

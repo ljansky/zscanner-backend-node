@@ -33,22 +33,8 @@ export function newTusUploader({
     const handlers: TusUploaderEventHandlers = {};
 
     tusServer.on(EVENTS.EVENT_UPLOAD_COMPLETE, (event) => {
-        const metadataList = event.file ? event.file.upload_metadata
-            .split(',')
-            .map((m: string) => {
-                const [name, encodedValue] = m.split(' ');
-                return {
-                    name,
-                    value: Buffer.from(encodedValue, 'base64').toString(),
-                };
-            }) : [];
-
-        const metadata: TusUploaderMetadata = metadataList.reduce((acc, curr) => ({
-            ...acc,
-            [curr.name]: curr.value,
-        }), {});
-        // TODO: set the filepath in better way (to have app root dir in config?)
-        metadata.filepath = `${__dirname}/../../../upload/${event.file.id}`;
+        const metadata = parseMetadata(event.file.upload_metadata);
+        metadata.filepath = `${tusServer.datastore.directory}/${event.file.id}`;
 
         if (metadata.uploadType && handlers[metadata.uploadType]) {
             handlers[metadata.uploadType](metadata);
@@ -57,10 +43,29 @@ export function newTusUploader({
 
     const middleware = e2k(tusServer.handle.bind(tusServer));
 
+    function parseMetadata(uploadMetadata: string) {
+        const metadataList = uploadMetadata
+            .split(',')
+            .map((m: string) => {
+                const [name, encodedValue] = m.split(' ');
+                return {
+                    name,
+                    value: Buffer.from(encodedValue, 'base64').toString(),
+                };
+            });
+
+        const metadata: TusUploaderMetadata = metadataList.reduce((acc, curr) => ({
+            ...acc,
+            [curr.name]: curr.value,
+        }), {});
+
+        return metadata;
+    }
+
     return {
-            getMiddleware: () => middleware,
-            onUploadComplete: (uploadType: string, handler: TusUploaderEventHandler) => {
-                handlers[uploadType] = handler;
-            },
+        getMiddleware: () => middleware,
+        onUploadComplete: (uploadType: string, handler: TusUploaderEventHandler) => {
+            handlers[uploadType] = handler;
+        },
     };
 }
