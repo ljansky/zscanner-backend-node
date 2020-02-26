@@ -129,3 +129,31 @@
        -F "page=@image.jpg" \
        http://localhost:10805/api-zscanner/v3/documents/page
 ```
+
+### Upload large file
+
+#### Start upload
+
+```
+  POST /api-zscanner/upload
+
+  With following headers (value in metadata is base64 encoded):
+    Tus-Resumable: 1.0.0
+    Upload-Length: 5980
+    Upload-Metadata: uploadType cGFnZQ==,relativePath bnVsbA==,name c2NvcmVzaGVldHMgKDQ4KS5wZGY=,type YXBwbGljYXRpb24vcGRm,filetype YXBwbGljYXRpb24vcGRm,filename c2NvcmVzaGVldHMgKDQ4KS5wZGY=
+```
+On success, there will be Location in response headers which is the endpoint for sending data
+
+#### Write data to existing upload
+
+PATCH request to url from Location header of POST request
+
+```
+  PATCH /api-zscanner/upload/298a1e1a0e9aed16017d7e5c607a77fd
+
+  With following headers:
+    Content-Type: application/offset+octet-stream
+    Tus-Resumable: 1.0.0
+    Upload-Offset: 0
+  And data in Request Payload
+```

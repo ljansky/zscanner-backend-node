@@ -54,7 +54,6 @@ class MockStore extends DataStore {
     public write(req: any, file_id: string) {
         return new Promise((resolve, reject) => {
             const file = this.files.find((f) => f.id === file_id);
-            // Stub resolve for tests
             const offset = 0;
 
             this.emit(EVENTS.EVENT_UPLOAD_COMPLETE, { file });
