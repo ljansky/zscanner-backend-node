@@ -51,3 +51,11 @@ export async function time<T>(fn: () => Promise<T>): Promise<[T, number]> {
 
     return [result, ms];
 }
+
+export class HttpError extends Error {
+    public status: number;
+    constructor(message: string, status: number) {
+        super(message);
+        this.status = status;
+    }
+}

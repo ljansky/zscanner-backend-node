@@ -1,7 +1,10 @@
 import e2k from 'express-to-koa';
+import { default as Koa } from "koa";
+import compose from 'koa-compose';
 import { DataStore, EVENTS, FileStore, Server } from 'tus-node-server';
 
 import { config } from "../../lib/config";
+import { HttpError } from '../../lib/utils';
 import { TusUploaderEventHandler, TusUploaderMetadata, Uploader } from '../types';
 
 interface TusUploaderEventHandlers {
@@ -30,29 +33,54 @@ export function newTusUploader({
     const tusServer = new Server();
     tusServer.datastore = store;
 
-    const handlers: TusUploaderEventHandlers = {};
+    const onCompleteHandlers: TusUploaderEventHandlers = {};
+    const beforeStartHandlers: TusUploaderEventHandlers = {};
 
     tusServer.on(EVENTS.EVENT_UPLOAD_COMPLETE, (event) => {
         const metadata = parseMetadata(event.file.upload_metadata);
         metadata.filepath = `${tusServer.datastore.directory}/${event.file.id}`;
 
-        if (metadata.uploadType && handlers[metadata.uploadType]) {
-            handlers[metadata.uploadType](metadata);
+        if (metadata.uploadType && onCompleteHandlers[metadata.uploadType]) {
+            onCompleteHandlers[metadata.uploadType](metadata);
         }
     });
 
-    const middleware = e2k(tusServer.handle.bind(tusServer));
+    const validationMiddleware: Koa.Middleware = async (ctx, next) => {
+        if (ctx.request.method === 'POST') {
+            const uploadMetadata = ctx.request.header['upload-metadata'];
+            if (!uploadMetadata) {
+                throw new HttpError('Missing metadata', 400);
+            }
+
+            const metadata = parseMetadata(uploadMetadata);
+            if (!metadata.uploadType) {
+                throw new HttpError('Missing metadata uploadType', 400);
+            }
+
+            if (beforeStartHandlers[metadata.uploadType]) {
+                beforeStartHandlers[metadata.uploadType](metadata);
+            }
+        }
+
+        await next();
+    };
+
+    const middleware = compose([
+        validationMiddleware,
+        e2k(tusServer.handle.bind(tusServer)),
+    ]);
 
     function parseMetadata(uploadMetadata: string) {
-        const metadataList = uploadMetadata
+        const metadataList = uploadMetadata ? uploadMetadata
             .split(',')
+            .filter(Boolean)
             .map((m: string) => {
                 const [name, encodedValue] = m.split(' ');
                 return {
                     name,
                     value: Buffer.from(encodedValue, 'base64').toString(),
                 };
-            });
+            }) : [];
 
         const metadata: TusUploaderMetadata = metadataList.reduce((acc, curr) => ({
             ...acc,
@@ -65,7 +93,10 @@ export function newTusUploader({
     return {
         getMiddleware: () => middleware,
         onUploadComplete: (uploadType: string, handler: TusUploaderEventHandler) => {
-            handlers[uploadType] = handler;
+            onCompleteHandlers[uploadType] = handler;
+        },
+        beforeUploadStart: (uploadType: string, handler: TusUploaderEventHandler) => {
+            beforeStartHandlers[uploadType] = handler;
         },
     };
 }
