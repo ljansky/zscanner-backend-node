@@ -121,7 +121,7 @@ describe("Documents tests", () => {
                 const response = await request(server)
                     .post(`/api-zscanner${path}/documents/page`)
                     .field("correlation", 'CORRELATION')
-                    .field("page", "1")
+                    .field("pageIndex", "1")
                     .attach("page", Buffer.from([1, 2, 3]), { contentType: "image/jpeg", filename: "image.jpg" });
                 expect(response.status).toEqual(200);
                 expect(storage.postedSummaries.length).toEqual(0);
