@@ -1,3 +1,4 @@
+import fs from 'fs';
 import * as koa from 'koa';
 import { default as KoaRouter } from 'koa-router';
 import { default as moment } from 'moment';
@@ -57,6 +58,9 @@ export function newDocumentsRouter(
         const correlation = metadata.correlation;
         const pageIndex = parseInt(metadata.pageIndex, 10);
         await documentStorage.submitDocumentPage(correlation, pageIndex, metadata.filepath);
+        fs.unlink(metadata.filepath, (err) => {
+            LOG.error('Error deleting uploaded page file', err);
+        });
     }
 
     async function postPage(ctx: koa.Context) {
