@@ -1,34 +1,10 @@
 import { randomBytes } from 'crypto';
-import { Server } from "http";
-import request, { Response } from 'supertest';
+import request from 'supertest';
 
 import { HttpError } from '../src/lib/utils';
-import { TusUploaderEventHandler, TusUploaderMetadata } from '../src/services/types';
+import { TusUploaderEventHandler } from '../src/services/types';
 
-import { newMockTusUploader, withApplication } from "./common";
-
-const testTusUploadClient = (server: Server) => ({
-    create: async ({ url, data, metadata }: { url: string; data: Buffer; metadata: TusUploaderMetadata }) => {
-        const uploadMetadata = Object.keys(metadata).reduce<string[]>((acc, curr) => {
-            return acc.concat(`${curr} ${Buffer.from(metadata[curr]).toString('base64')}`);
-        }, []).join(',');
-
-        return request(server)
-            .post(url)
-            .set('Tus-Resumable', '1.0.0')
-            .set('Upload-Length', data.length.toString())
-            .set('Upload-Metadata', uploadMetadata);
-    },
-    write: async ({ url, createResponse, data }: { url: string; createResponse: Response; data: Buffer; }) => {
-        const fileId = createResponse.header.location.split('/').pop();
-        return request(server)
-            .patch(`${url}/${fileId}`)
-            .set('Tus-Resumable', '1.0.0')
-            .set('Upload-Offset', '0')
-            .set('Content-Type', 'application/offset+octet-stream')
-            .send(data);
-    },
-});
+import { newMockTusUploader, newTusUploadClient, withApplication } from "./common";
 
 describe("Uploader", () => {
     const url = '/api-zscanner/upload';
@@ -47,7 +23,7 @@ describe("Uploader", () => {
         await withApplication({
             uploader,
         }, async (server) => {
-            const uploadClient = testTusUploadClient(server);
+            const uploadClient = newTusUploadClient(server);
 
             const createResponse = await uploadClient.create({
                 url,
@@ -75,7 +51,7 @@ describe("Uploader", () => {
         await withApplication({
             uploader,
         }, async (server) => {
-            const uploadClient = testTusUploadClient(server);
+            const uploadClient = newTusUploadClient(server);
 
             const createResponse = await uploadClient.create({
                 url,
@@ -110,7 +86,7 @@ describe("Uploader", () => {
         await withApplication({
             uploader,
         }, async (server) => {
-            const uploadClient = testTusUploadClient(server);
+            const uploadClient = newTusUploadClient(server);
 
             const createResponse = await uploadClient.create({
                 url,

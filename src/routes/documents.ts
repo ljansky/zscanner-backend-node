@@ -4,7 +4,7 @@ import { default as moment } from 'moment';
 
 import { config } from "../lib/config";
 import { createLogger } from "../lib/logging";
-import { wrapRouteWithErrorHandler } from "../lib/utils";
+import { wrapRouteWithErrorHandler, HttpError } from "../lib/utils";
 import { DocumentStorage, DocumentSummary, MetricsStorage, TusUploaderMetadata, Uploader } from "../services/types";
 
 const formidable = require('koa2-formidable');
@@ -39,10 +39,21 @@ export function newDocumentsRouter(
     router.post('/v3/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV3));
 
     uploader.onUploadComplete('page', uploadPage);
+    uploader.beforeUploadStart('page', validateUploadMetadata);
 
     return router;
 
+    function validateUploadMetadata(metadata: TusUploaderMetadata) {
+        if (!metadata.correlation) {
+            throw new HttpError('No correlation in the request', 400);
+        }
+        if (!metadata.pageIndex || !isFinite(parseInt(metadata.pageIndex, 10))) {
+            throw new HttpError('No page in the request', 400);
+        }
+    }
+
     async function uploadPage(metadata: TusUploaderMetadata) {
+        validateUploadMetadata(metadata);
         const correlation = metadata.correlation;
         const pageIndex = parseInt(metadata.pageIndex, 10);
         await documentStorage.submitDocumentPage(correlation, pageIndex, metadata.filepath);
@@ -53,6 +64,7 @@ export function newDocumentsRouter(
             return error('Not multipart/form-data');
         }
         const body = ctx.request.body;
+
         const pageFile = (ctx.request as any).files.page;
 
         if (!body) {
