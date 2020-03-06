@@ -169,6 +169,38 @@ describe("Documents tests", () => {
                 ]);
             });
     });
+
+    test('Check that page upload fails if required metadata are missing', async () => {
+        const storage = newMockDocumentStorage();
+        await withApplication({
+                documentStorage: storage,
+            }, async (server) => {
+                const uploadClient = newTusUploadClient(server);
+                const url = '/api-zscanner/upload';
+                const data = Buffer.from([1, 2, 3]);
+                const createResponseWithoutPageIndex = await uploadClient.create({
+                    url,
+                    data,
+                    metadata: {
+                        uploadType: 'page',
+                        correlation: 'CORRELATION',
+                    },
+                });
+
+                expect(createResponseWithoutPageIndex.status).toEqual(400);
+
+                const createResponseWithoutCorrerlation = await uploadClient.create({
+                    url,
+                    data,
+                    metadata: {
+                        uploadType: 'page',
+                        pageIndex: '1',
+                    },
+                });
+
+                expect(createResponseWithoutCorrerlation.status).toEqual(400);
+            });
+    });
 });
 
 function newMockDocumentStorage() {

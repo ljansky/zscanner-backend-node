@@ -77,7 +77,7 @@ class MockStore extends DataStore {
 }
 
 export function newMockTusUploader() {
-    const tmpDirObj = tmp.dirSync();
+    const tmpDirObj = tmp.dirSync({ unsafeCleanup: true });
     return newTusUploader({
         store: new MockStore({
             path: '/api-zscanner/upload',
