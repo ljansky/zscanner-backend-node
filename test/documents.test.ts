@@ -4,7 +4,7 @@ import request = require('supertest');
 import { newDemoDocumentStorage } from "../src/services/document-storages/demo";
 import { DocumentSummary } from "../src/services/types";
 
-import { newMockMetricsStorage, newStaticAuthenticator, withApplication } from "./common";
+import { newMockMetricsStorage, newStaticAuthenticator, newTusUploadClient, withApplication } from "./common";
 
 describe("Documents tests", () => {
     ["/v1", "/v2"].forEach((path) => {
@@ -134,6 +134,72 @@ describe("Documents tests", () => {
                 ]);
             });
         });
+    });
+
+    test('Check that page upload with uploader bubbles to document storage', async () => {
+        const storage = newMockDocumentStorage();
+        await withApplication({
+                documentStorage: storage,
+            }, async (server) => {
+                const uploadClient = newTusUploadClient(server);
+                const url = '/api-zscanner/upload';
+                const data = Buffer.from([1, 2, 3]);
+                const createResponse = await uploadClient.create({
+                    url,
+                    data,
+                    metadata: {
+                        uploadType: 'page',
+                        correlation: 'CORRELATION',
+                        pageIndex: '1',
+                    },
+                });
+
+                expect(createResponse.status).toEqual(201);
+
+                const writeResponse = await uploadClient.write({ url, createResponse, data });
+
+                expect(writeResponse.status).toEqual(204);
+                expect(storage.postedSummaries.length).toEqual(0);
+                expect(storage.postedPages).toEqual([
+                    {
+                        correlationId: "CORRELATION",
+                        pageIndex: 1,
+                        file: data.toString('hex'),
+                    },
+                ]);
+            });
+    });
+
+    test('Check that page upload fails if required metadata are missing', async () => {
+        const storage = newMockDocumentStorage();
+        await withApplication({
+                documentStorage: storage,
+            }, async (server) => {
+                const uploadClient = newTusUploadClient(server);
+                const url = '/api-zscanner/upload';
+                const data = Buffer.from([1, 2, 3]);
+                const createResponseWithoutPageIndex = await uploadClient.create({
+                    url,
+                    data,
+                    metadata: {
+                        uploadType: 'page',
+                        correlation: 'CORRELATION',
+                    },
+                });
+
+                expect(createResponseWithoutPageIndex.status).toEqual(400);
+
+                const createResponseWithoutCorrerlation = await uploadClient.create({
+                    url,
+                    data,
+                    metadata: {
+                        uploadType: 'page',
+                        pageIndex: '1',
+                    },
+                });
+
+                expect(createResponseWithoutCorrerlation.status).toEqual(400);
+            });
     });
 });
 

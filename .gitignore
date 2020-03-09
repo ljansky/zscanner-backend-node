@@ -56,3 +56,5 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
+#files from uploader
+upload/

@@ -4,8 +4,10 @@ import { default as moment } from 'moment';
 
 import { config } from "../lib/config";
 import { createLogger } from "../lib/logging";
-import { wrapRouteWithErrorHandler } from "../lib/utils";
-import { DocumentStorage, DocumentSummary, MetricsStorage } from "../services/types";
+import { wrapRouteWithErrorHandler, HttpError } from "../lib/utils";
+import { DocumentStorage, DocumentSummary, MetricsStorage, TusUploaderMetadata, Uploader } from "../services/types";
+
+const formidable = require('koa2-formidable');
 
 const LOG = createLogger(__filename);
 
@@ -13,29 +15,56 @@ export function newDocumentsRouter(
     {
         documentStorage,
         metricsStorage,
+        uploader,
     }: {
         documentStorage: DocumentStorage,
         metricsStorage: MetricsStorage,
+        uploader: Uploader,
     }) {
 
     const router = new KoaRouter();
 
     router.prefix(config.ROUTER_PREFIX);
 
-    router.post('/v1/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
-    router.post('/v1/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
-    router.post('/v2/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
-    router.post('/v2/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
-    router.post('/v3/documents/page', wrapRouteWithErrorHandler(LOG, postPage));
+    const formidableMiddleware = formidable({
+        encoding: 'utf-8',
+        maxFileSize: 1000 * 1024 * 1024,
+    });
+
+    router.post('/v1/documents/page', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postPage));
+    router.post('/v1/documents/summary', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
+    router.post('/v2/documents/page', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postPage));
+    router.post('/v2/documents/summary', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
+    router.post('/v3/documents/page', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postPage));
     router.post('/v3/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV3));
 
+    uploader.onUploadComplete('page', uploadPage);
+    uploader.beforeUploadStart('page', validateUploadMetadata);
+
     return router;
+
+    function validateUploadMetadata(metadata: TusUploaderMetadata) {
+        if (!metadata.correlation) {
+            throw new HttpError('No correlation in the request', 400);
+        }
+        if (!metadata.pageIndex || !isFinite(parseInt(metadata.pageIndex, 10))) {
+            throw new HttpError('No page in the request', 400);
+        }
+    }
+
+    async function uploadPage(metadata: TusUploaderMetadata) {
+        validateUploadMetadata(metadata);
+        const correlation = metadata.correlation;
+        const pageIndex = parseInt(metadata.pageIndex, 10);
+        await documentStorage.submitDocumentPage(correlation, pageIndex, metadata.filepath);
+    }
 
     async function postPage(ctx: koa.Context) {
         if (ctx.request.type !== `multipart/form-data`) {
             return error('Not multipart/form-data');
         }
         const body = ctx.request.body;
+
         const pageFile = (ctx.request as any).files.page;
 
         if (!body) {

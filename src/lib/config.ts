@@ -13,4 +13,6 @@ export const config = {
     DOCUMENT_STORAGE: process.env.ZSCANNER_STORAGE || 'demo',
 
     ROUTER_PREFIX: process.env.ROUTER_PREFIX || '/api-zscanner',
+
+    UPLOADER_DIRECTORY: process.env.UPLOADER_DIRECTORY || 'upload',
 };

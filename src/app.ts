@@ -8,7 +8,8 @@ import { newDocumentsRouter } from "./routes/documents";
 import { newDocumentTypesRouter } from "./routes/documenttypes";
 import { newFoldersRouter } from "./routes/folders";
 import { newHealthCheckRouter } from "./routes/healthcheck";
-import { Authenticator, DocumentStorage, MetricsStorage } from "./services/types";
+import { newUploadRouter } from "./routes/upload";
+import { Authenticator, DocumentStorage, MetricsStorage, Uploader } from "./services/types";
 
 export { config } from "./lib/config";
 export { createLogger } from "./lib/logging";
@@ -20,7 +21,6 @@ export { newSeacatAuthenticator } from "./services/authenticators/seacat";
 export { newDemoDocumentStorage } from "./services/document-storages/demo";
 
 const onerror = require('koa-onerror');
-const formidable = require('koa2-formidable');
 
 const LOG = createLogger(__filename);
 
@@ -29,10 +29,12 @@ export function constructKoaApplication(
         authenticator,
         documentStorage,
         metricsStorage,
+        uploader,
     }: {
         authenticator: Authenticator,
         documentStorage: DocumentStorage,
         metricsStorage: MetricsStorage,
+        uploader: Uploader,
     }) {
 
     const app = new Koa();
@@ -41,15 +43,17 @@ export function constructKoaApplication(
     return app;
 
     function configureRoutes() {
-        const documentsRouter = newDocumentsRouter({ documentStorage, metricsStorage });
+        const documentsRouter = newDocumentsRouter({ documentStorage, metricsStorage, uploader });
         const foldersRouter = newFoldersRouter({ documentStorage, metricsStorage });
         const documentTypesRouter = newDocumentTypesRouter({ documentStorage });
         const healthCheckRouter = newHealthCheckRouter({ components: [documentStorage, authenticator, metricsStorage] });
+        const uploadRouter = newUploadRouter({ uploader });
 
         app.use(documentsRouter.routes());
         app.use(foldersRouter.routes());
         app.use(documentTypesRouter.routes());
         app.use(healthCheckRouter.routes());
+        app.use(uploadRouter.routes());
     }
 
     function configureMiddleware() {
@@ -66,10 +70,6 @@ export function constructKoaApplication(
             }
         });
 
-        app.use(formidable({
-            encoding: 'utf-8',
-            maxFileSize: 1000 * 1024 * 1024,
-        }));
         app.use(bodyparser({
             enableTypes: ['json', 'form', 'text'],
         }));

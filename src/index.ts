@@ -5,7 +5,8 @@ import { newNoopAuthenticator } from "./services/authenticators/noop";
 import { newSeacatAuthenticator } from "./services/authenticators/seacat";
 import { newDemoDocumentStorage } from "./services/document-storages/demo";
 import { newNoopMetricsStorage } from "./services/metrics-storages/noop";
-import { Authenticator, DocumentStorage } from "./services/types";
+import { Authenticator, DocumentStorage, Uploader } from "./services/types";
+import { newTusStore, newTusUploader } from "./services/uploader/tus-uploader";
 
 const LOG = createLogger(__filename);
 
@@ -26,10 +27,13 @@ async function start() {
     const metricsStorage = constructMetricsStorage();
     await metricsStorage.initialize();
 
+    const uploader = constructUploader();
+
     const app = constructKoaApplication({
         authenticator,
         documentStorage,
         metricsStorage,
+        uploader,
     });
 
     app.listen(config.PORT, () => LOG.info(`Listening on port ${config.PORT}...`));
@@ -57,4 +61,13 @@ function constructDocumentStorage(): DocumentStorage {
 
 function constructMetricsStorage(): MetricsStorage {
     return newNoopMetricsStorage();
+}
+
+function constructUploader(): Uploader {
+    return newTusUploader({
+        store: newTusStore({
+            path: '/upload',
+            directory: config.UPLOADER_DIRECTORY,
+        }),
+    });
 }

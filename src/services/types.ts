@@ -111,3 +111,23 @@ interface DocumentFolderDecodeMetricsEvent extends BaseMetricsEvent {
         query: string;
     };
 }
+
+export interface Uploader {
+    getMiddleware: () => koa.Middleware;
+    onUploadComplete: (uploadType: string, handler: TusUploaderEventHandler) => void;
+    beforeUploadStart: (uploadType: string, handler: TusUploaderEventHandler) => void;
+}
+
+export interface TusEvent {
+    file: {
+        id: string;
+        upload_length: string;
+        upload_metadata: string;
+    };
+}
+
+export interface TusUploaderMetadata {
+    [key: string]: string;
+}
+
+export type TusUploaderEventHandler = (metadata: TusUploaderMetadata) => void;
