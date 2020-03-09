@@ -76,11 +76,20 @@ export function newDocumentsRouter(
         if (!body.correlation) {
             return error('No correlation in the request');
         }
-        if (!body.pageIndex && !isFinite(parseInt(body.pageIndex, 10))) {
-            return error('No pageIndex in the request');
+
+        let pageIndex;
+
+        if (body.pageIndex && isFinite(parseInt(body.pageIndex, 10))) {
+            pageIndex = parseInt(body.pageIndex, 10);
         }
 
-        const pageIndex = parseInt(body.pageIndex, 10);
+        if (body.page && isFinite(parseInt(body.page, 10))) {
+            pageIndex = parseInt(body.page, 10);
+        }
+
+        if (typeof pageIndex === 'undefined') {
+            return error('No pageIndex in the request');
+        }
 
         await documentStorage.submitDocumentPage(body.correlation, pageIndex, pageFile.path);
 
