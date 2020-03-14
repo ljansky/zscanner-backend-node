@@ -15,4 +15,5 @@ export const config = {
     ROUTER_PREFIX: process.env.ROUTER_PREFIX || '/api-zscanner',
 
     UPLOADER_DIRECTORY: process.env.UPLOADER_DIRECTORY || 'upload',
+    UPLOADER_EXPIRATION_TIME: process.env.UPLOADER_EXPIRATION_TIME && parseInt(process.env.UPLOADER_EXPIRATION_TIME, 10) || 1000 * 3600 * 24,
 };
