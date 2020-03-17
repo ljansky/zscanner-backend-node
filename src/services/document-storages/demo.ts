@@ -20,7 +20,7 @@ export function newDemoDocumentStorage(
         getFolderByBarcode,
         getDocumentTypes,
         submitDocumentPage,
-        submitDocumentPageLarge: submitDocumentPage,
+        submitLargeDocumentPage: submitDocumentPage,
         submitDocumentSummary,
         getHealth: () => ({ level: HEALTH_LEVEL_OK, messages: [] }),
     };
