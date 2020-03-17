@@ -19,6 +19,7 @@ export { newNoopAuthenticator } from "./services/authenticators/noop";
 export { newNoopMetricsStorage } from "./services/metrics-storages/noop";
 export { newSeacatAuthenticator } from "./services/authenticators/seacat";
 export { newDemoDocumentStorage } from "./services/document-storages/demo";
+export { newTusUploader, newTusStore } from './services/uploader/tus-uploader';
 
 const onerror = require('koa-onerror');
 
