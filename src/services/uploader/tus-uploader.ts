@@ -1,8 +1,9 @@
+///<reference path="../../../types/tus-node-server/index.d.ts" />
 import { CronJob } from 'cron';
 import e2k from 'express-to-koa';
 import { default as Koa } from "koa";
 import compose from 'koa-compose';
-import { EVENTS, FileStore, Server } from 'tus-node-server';
+import { DataStore, EVENTS, FileStore, Server } from 'tus-node-server';
 
 import { clearExpiredFiles } from '../../lib/clear-expired-files';
 import { config } from "../../lib/config";
@@ -21,7 +22,7 @@ export function newTusStore({
 }: {
     directory?: string;
     path?: string;
-}): any {
+}): DataStore {
     const store = new FileStore({
         directory,
         path: `${config.ROUTER_PREFIX}${path}`,
@@ -41,7 +42,7 @@ export function newTusStore({
 export function newTusUploader({
     store,
 }: {
-    store: any,
+    store: DataStore,
 }): Uploader {
 
     const tusServer = new Server();
