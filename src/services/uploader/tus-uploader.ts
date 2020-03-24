@@ -1,12 +1,16 @@
+import { CronJob } from 'cron';
 import e2k from 'express-to-koa';
 import { default as Koa } from "koa";
 import compose from 'koa-compose';
 import { DataStore, EVENTS, FileStore, Server } from 'tus-node-server';
 
+import { clearExpiredFiles } from '../../lib/clear-expired-files';
 import { config } from "../../lib/config";
+import { createLogger } from "../../lib/logging";
 import { HttpError } from '../../lib/utils';
 import { TusUploaderEventHandler, TusUploaderMetadata, Uploader } from '../types';
 
+const LOG = createLogger(__filename);
 interface TusUploaderEventHandlers {
     [uploadType: string]: TusUploaderEventHandler;
 }
@@ -18,10 +22,20 @@ export function newTusStore({
     directory?: string;
     path?: string;
 }): DataStore {
-    return new FileStore({
+    const store = new FileStore({
         directory,
         path: `${config.ROUTER_PREFIX}${path}`,
     });
+
+    if (directory) {
+        const clearJob = new CronJob('0 * * * * *', () => {
+            clearExpiredFiles(directory, config.UPLOADER_EXPIRATION_TIME)
+                .catch((err) => LOG.error('Error while clearing expired files', err));
+        });
+        clearJob.start();
+    }
+
+    return store;
 }
 
 export function newTusUploader({

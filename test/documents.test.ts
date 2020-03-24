@@ -121,7 +121,7 @@ describe("Documents tests", () => {
                 const response = await request(server)
                     .post(`/api-zscanner${path}/documents/page`)
                     .field("correlation", 'CORRELATION')
-                    .field("page", "1")
+                    .field("pageIndex", "1")
                     .attach("page", Buffer.from([1, 2, 3]), { contentType: "image/jpeg", filename: "image.jpg" });
                 expect(response.status).toEqual(200);
                 expect(storage.postedSummaries.length).toEqual(0);
@@ -132,6 +132,36 @@ describe("Documents tests", () => {
                         file: "010203",
                     },
                 ]);
+            });
+        });
+
+        test(`Check that document page upload ${path} fails if required parameters are missing`, async () => {
+            const storage = newMockDocumentStorage();
+            await withApplication({
+                documentStorage: storage,
+            }, async (server) => {
+                const uploadData = Buffer.from([1, 2, 3]);
+                const uploadOptions = { contentType: "image/jpeg", filename: "image.jpg" };
+                const responseWithoutPageIndex = await request(server)
+                    .post(`/api-zscanner${path}/documents/page`)
+                    .field("correlation", 'CORRELATION')
+                    .attach("page", uploadData, uploadOptions);
+                expect(responseWithoutPageIndex.status).toEqual(400);
+
+                const responseWithoutCorrelation = await request(server)
+                    .post(`/api-zscanner${path}/documents/page`)
+                    .field("pageIndex", "1")
+                    .attach("page", uploadData, uploadOptions);
+                expect(responseWithoutCorrelation.status).toEqual(400);
+
+                const responseWithoutPageFile = await request(server)
+                    .post(`/api-zscanner${path}/documents/page`)
+                    .field("correlation", 'CORRELATION')
+                    .field("pageIndex", "1");
+                expect(responseWithoutPageFile.status).toEqual(400);
+
+                expect(storage.postedSummaries.length).toEqual(0);
+                expect(storage.postedPages).toEqual([]);
             });
         });
     });

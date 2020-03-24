@@ -1,3 +1,4 @@
+import fs from 'fs';
 import * as koa from 'koa';
 import { default as KoaRouter } from 'koa-router';
 import { default as moment } from 'moment';
@@ -57,6 +58,9 @@ export function newDocumentsRouter(
         const correlation = metadata.correlation;
         const pageIndex = parseInt(metadata.pageIndex, 10);
         await documentStorage.submitDocumentPage(correlation, pageIndex, metadata.filepath);
+        fs.unlink(metadata.filepath, (err) => {
+            LOG.error('Error deleting uploaded page file', err);
+        });
     }
 
     async function postPage(ctx: koa.Context) {
@@ -76,14 +80,20 @@ export function newDocumentsRouter(
         if (!body.correlation) {
             return error('No correlation in the request');
         }
+
+        let pageIndex;
+
         if (body.pageIndex && isFinite(parseInt(body.pageIndex, 10))) {
-          body.page = body.pageIndex;
-        }
-        if (!body.page || !isFinite(parseInt(body.page, 10))) {
-            return error('No page in the request');
+            pageIndex = parseInt(body.pageIndex, 10);
         }
 
-        const pageIndex = parseInt(body.page, 10);
+        if (body.page && isFinite(parseInt(body.page, 10))) {
+            pageIndex = parseInt(body.page, 10);
+        }
+
+        if (typeof pageIndex === 'undefined') {
+            return error('No pageIndex in the request');
+        }
 
         await documentStorage.submitDocumentPage(body.correlation, pageIndex, pageFile.path);
 
