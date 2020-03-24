@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import * as koa from 'koa';
 import { default as KoaRouter } from 'koa-router';
 import { default as moment } from 'moment';
@@ -40,24 +40,39 @@ export function newDocumentsRouter(
     router.post('/v3/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV3));
 
     uploader.onUploadComplete('page', uploadPage);
-    uploader.beforeUploadStart('page', validateUploadMetadata);
+    uploader.beforeUploadStart('page', (metadata) => {
+        try {
+            validateUploadMetadata(metadata);
+        } catch (err) {
+            throw new HttpError(err.message, 400);
+        }
+    });
 
     return router;
 
     function validateUploadMetadata(metadata: TusUploaderMetadata) {
         if (!metadata.correlation) {
-            throw new HttpError('No correlation in the request', 400);
+            throw new Error('No correlation in the request');
         }
         if (!metadata.pageIndex || !isFinite(parseInt(metadata.pageIndex, 10))) {
-            throw new HttpError('No page in the request', 400);
+            throw new Error('No page in the request');
+        }
+
+        if (!metadata.filetype) {
+            throw new Error('No filetype in the request');
         }
     }
 
     async function uploadPage(metadata: TusUploaderMetadata) {
         validateUploadMetadata(metadata);
+        if (!metadata.filepath) {
+            throw new Error('No filepath in metadata');
+        }
+
         const correlation = metadata.correlation;
         const pageIndex = parseInt(metadata.pageIndex, 10);
-        await documentStorage.submitDocumentPage(correlation, pageIndex, metadata.filepath);
+        const contentType = metadata.filetype;
+        await documentStorage.submitLargeDocumentPage(correlation, pageIndex, metadata.filepath, contentType);
         fs.unlink(metadata.filepath, (err) => {
             LOG.error('Error deleting uploaded page file', err);
         });

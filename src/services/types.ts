@@ -28,6 +28,7 @@ export interface DocumentStorage extends HealthConscious {
     getDocumentTypes(): Promise<DocumentType[]>;
 
     submitDocumentPage(correlationId: string, pageIndex: number, file: string): Promise<void>;
+    submitLargeDocumentPage(correlationId: string, pageIndex: number, file: string, contentType: string): Promise<void>;
     submitDocumentSummary(correlationId: string, summary: DocumentSummary): Promise<void>;
 }
 

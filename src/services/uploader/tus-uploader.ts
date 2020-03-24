@@ -1,3 +1,4 @@
+///<reference path="../../../types/tus-node-server/index.d.ts" />
 import { CronJob } from 'cron';
 import e2k from 'express-to-koa';
 import { default as Koa } from "koa";

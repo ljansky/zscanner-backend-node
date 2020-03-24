@@ -181,6 +181,7 @@ describe("Documents tests", () => {
                         uploadType: 'page',
                         correlation: 'CORRELATION',
                         pageIndex: '1',
+                        filetype: 'test',
                     },
                 });
 
@@ -214,6 +215,7 @@ describe("Documents tests", () => {
                     metadata: {
                         uploadType: 'page',
                         correlation: 'CORRELATION',
+                        filetype: 'test',
                     },
                 });
 
@@ -225,10 +227,23 @@ describe("Documents tests", () => {
                     metadata: {
                         uploadType: 'page',
                         pageIndex: '1',
+                        filetype: 'test',
                     },
                 });
 
                 expect(createResponseWithoutCorrerlation.status).toEqual(400);
+
+                const createResponseWithoutFiletype = await uploadClient.create({
+                    url,
+                    data,
+                    metadata: {
+                        uploadType: 'page',
+                        correlation: 'CORRELATION',
+                        pageIndex: '1',
+                    },
+                });
+
+                expect(createResponseWithoutFiletype.status).toEqual(400);
             });
     });
 });
@@ -242,15 +257,18 @@ function newMockDocumentStorage() {
                 summary,
             });
         },
-        async submitDocumentPage(correlationId: string, pageIndex: number, file: string): Promise<void> {
-            c.postedPages.push({
-                correlationId,
-                pageIndex,
-                file: fs.readFileSync(file).toString("hex"),
-            });
-        },
+        submitDocumentPage,
+        submitLargeDocumentPage: submitDocumentPage,
         postedSummaries: [] as any[],
         postedPages: [] as any[],
     };
     return c;
+
+    async function submitDocumentPage(correlationId: string, pageIndex: number, file: string): Promise<void> {
+        c.postedPages.push({
+            correlationId,
+            pageIndex,
+            file: fs.readFileSync(file).toString("hex"),
+        });
+    }
 }
