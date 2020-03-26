@@ -73,9 +73,13 @@ export function newDocumentsRouter(
         const pageIndex = parseInt(metadata.pageIndex, 10);
         const contentType = metadata.filetype;
         await documentStorage.submitLargeDocumentPage(correlation, pageIndex, metadata.filepath, contentType);
-        fs.unlink(metadata.filepath, (err) => {
-            LOG.error('Error deleting uploaded page file', err);
-        });
+        if (!config.UPLOADER_KEEP_PROCESSED_FILES) {
+            fs.unlink(metadata.filepath, (err) => {
+                if (err) {
+                    LOG.error('Error deleting uploaded page file', err);
+                }
+            });
+        }
     }
 
     async function postPage(ctx: koa.Context) {

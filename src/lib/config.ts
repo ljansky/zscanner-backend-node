@@ -16,4 +16,5 @@ export const config = {
 
     UPLOADER_DIRECTORY: process.env.UPLOADER_DIRECTORY || 'upload',
     UPLOADER_EXPIRATION_TIME: process.env.UPLOADER_EXPIRATION_TIME && parseInt(process.env.UPLOADER_EXPIRATION_TIME, 10) || 1000 * 3600 * 24,
+    UPLOADER_KEEP_PROCESSED_FILES: process.env.UPLOADER_KEEP_PROCESSED_FILES || false,
 };
