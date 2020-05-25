@@ -26,6 +26,7 @@ export function newFoldersRouter(
     router.get('/v2/patients/decode', wrapRouteWithErrorHandler(LOG, getPatientByBarcodeV1V2));
     router.get('/v3/folders/search', wrapRouteWithErrorHandler(LOG, getFoldersV3));
     router.get('/v3/folders/decode', wrapRouteWithErrorHandler(LOG, getFolderByBarcodeV3));
+    router.get('/v3/folders/suggest', wrapRouteWithErrorHandler(LOG, getSuggestedFoldersV3));
 
     return router;
 
@@ -116,6 +117,23 @@ export function newFoldersRouter(
         } else {
             ctx.response.status = 404;
         }
+    }
+
+    async function getSuggestedFoldersV3(ctx: koa.Context) {
+        metricsStorage.log({
+            ts: new Date(),
+            type: "search",
+            version: 3,
+            user: ctx.state.userId,
+            data: {
+                query: ctx.query.query,
+            },
+        });
+
+        const query = sanitizeQuery(ctx.query.query);
+        ctx.body = query ? await documentStorage.suggestFolders(query, ctx.state.userId) : [];
+        ctx.response.status = 200;
+        ctx.response.message = 'OK';
     }
 }
 

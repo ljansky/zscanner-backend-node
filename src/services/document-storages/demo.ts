@@ -3,7 +3,7 @@ import * as util from 'util';
 
 import { createLogger } from "../../lib/logging";
 import { normalizeString } from "../../lib/utils";
-import { DocumentFolder, DocumentStorage, DocumentSummary, DocumentType, HEALTH_LEVEL_OK } from "../types";
+import { DocumentFolder, DocumentStorage, DocumentSummary, DocumentType, HEALTH_LEVEL_OK, SuggestedDocumentFolder } from "../types";
 
 const LOG = createLogger(__filename);
 
@@ -17,6 +17,7 @@ export function newDemoDocumentStorage(
     return {
         initialize,
         findFolders,
+        suggestFolders,
         getFolderByBarcode,
         getDocumentTypes,
         submitDocumentPage,
@@ -36,6 +37,13 @@ export function newDemoDocumentStorage(
             .filter((f) => normalizeString(f.externalId).indexOf(query) > -1
                                     || normalizeString(f.internalId).indexOf(query) > -1
                                     || normalizeString(f.name).indexOf(query) > -1);
+    }
+
+    async function suggestFolders(query: string): Promise<SuggestedDocumentFolder[]> {
+        return (await findFolders(query)).map((folder, index) => ({
+            ...folder,
+            suggested: index < 2,
+        }));
     }
 
     async function getFolderByBarcode(folderBarcode: string): Promise<DocumentFolder | undefined> {

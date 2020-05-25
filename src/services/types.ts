@@ -23,6 +23,7 @@ export interface DocumentStorage extends HealthConscious {
     initialize(): Promise<void>;
 
     findFolders(query: string): Promise<DocumentFolder[]>;
+    suggestFolders(query: string, user: string): Promise<SuggestedDocumentFolder[]>;
     getFolderByBarcode(folderBarcode: string): Promise<DocumentFolder | undefined>;
 
     getDocumentTypes(): Promise<DocumentType[]>;
@@ -42,6 +43,10 @@ export interface DocumentFolder {
     externalId: string;
     internalId: string;
     name: string;
+}
+
+export interface SuggestedDocumentFolder extends DocumentFolder {
+    suggested: boolean;
 }
 
 export interface Patient {

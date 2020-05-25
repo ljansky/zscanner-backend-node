@@ -1,7 +1,7 @@
 import request = require('supertest');
 
 import { newDemoDocumentStorage } from "../src/services/document-storages/demo";
-import { DocumentFolder } from "../src/services/types";
+import { DocumentFolder, SuggestedDocumentFolder } from "../src/services/types";
 
 import { newMockMetricsStorage, newStaticAuthenticator, withApplication } from "./common";
 
@@ -51,6 +51,36 @@ describe("Folders/patients tests", () => {
                     externalId: 'EXTERNAL-ID',
                     internalId: 'INTERNAL-ID',
                     name: 'THE-NAME',
+                },
+            ]);
+
+            metricsStorage.expectEvent({
+                ts: new Date(),
+                type: "search",
+                version: 3,
+                user: 'USER',
+                data: {
+                    query: 'QUERY',
+                },
+            });
+        });
+    });
+
+    test(`Check that folder suggest /v3/folders/suggest bubbles to document storage and returns correct result`, async () => {
+        const metricsStorage = newMockMetricsStorage();
+        await withApplication({
+            authenticator: newStaticAuthenticator(),
+            documentStorage: MOCK_DOCUMENT_STORAGE,
+            metricsStorage,
+        }, async (server) => {
+            const response = await request(server).get(`/api-zscanner/v3/folders/suggest?query=QUERY`);
+            expect(response.status).toEqual(200);
+            expect(response.body).toEqual([
+                {
+                    externalId: 'EXTERNAL-ID',
+                    internalId: 'INTERNAL-ID',
+                    name: 'THE-NAME',
+                    suggested: true,
                 },
             ]);
 
@@ -159,6 +189,17 @@ const MOCK_DOCUMENT_STORAGE = {
                 name: 'THE-NAME',
                 externalId: 'EXTERNAL-ID',
                 internalId: 'INTERNAL-ID',
+            },
+        ];
+    },
+    async suggestFolders(query: string): Promise<SuggestedDocumentFolder[]> {
+        expect(query).toEqual("QUERY");
+        return [
+            {
+                name: 'THE-NAME',
+                externalId: 'EXTERNAL-ID',
+                internalId: 'INTERNAL-ID',
+                suggested: true,
             },
         ];
     },
