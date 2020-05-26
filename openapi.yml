@@ -132,7 +132,36 @@ paths:
                   { "externalId": "925221/9449", "internalId": "124587112", "name": "Fiona Shreková" },
                   { "externalId": "011116/0632", "internalId": "124587113", "name": "Šípková Růženka" }
                 ]
-            
+  
+  /v3/folders/suggest:
+    get:
+      summary: Search for a folder via free text to get list with suggested values
+      operationId: suggestFoldersByName
+      description: |
+        Phone calls this service repeatedly to get a list of suggestions for the list of folders
+        matching the free text query. Folders in list have flag suggested, telling if it was suggested
+        for logged user by special suggest rules or found only by name
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of suggested folders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SuggestedDocumentFolder'
+              example: 
+                [
+                  { "externalId": "925221/9449", "internalId": "124587112", "name": "Fiona Shreková", "suggested": true },
+                  { "externalId": "011116/0632", "internalId": "124587113", "name": "Šípková Růženka", "suggested": false }
+                ]
+
   /v3/folders/decode:
     get:
       summary: Get a folder by internalId
@@ -206,3 +235,19 @@ components:
         - internalId
         - name
 
+    SuggestedDocumentFolder:
+      type: object
+      properties:
+        externalId:
+          type: string
+        internalId:
+          type: string
+        name:
+          type: string
+        suggested:
+          type: boolean
+      required:
+        - externalId
+        - internalId
+        - name
+        - suggested

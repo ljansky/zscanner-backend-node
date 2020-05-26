@@ -56,6 +56,34 @@
        http://localhost:10805/api-zscanner/v3/folders/search?query=ova
 ```
 
+### Suggest Folders by Query
+
+```
+  GET /api-zscanner/v3/folders/suggest?query=mach
+
+  200 OK
+  [
+      {
+          externalId: '925221/9449',
+          internalId: '124587112',
+          name: 'Radana Macháčková',
+          suggested: true
+      },
+      {
+          externalId: '011116/0632',
+          internalId: '124587113',
+          name: 'František Machajda',
+          suggested: false
+      },
+      ...
+  ]
+```
+
+```
+  curl -v -v \
+       http://localhost:10805/api-zscanner/v3/folders/suggest?query=ova
+```
+
 ### Request Folder by Barcode
 
 ```
