@@ -85,7 +85,7 @@ export interface PatientDocumentSummary {
     user: string;
 }
 
-export type MetricsEvent = DocumentSummaryUploadMetricsEvent | DocumentFolderQueryMetricsEvent | DocumentFolderDecodeMetricsEvent;
+export type MetricsEvent = DocumentSummaryUploadMetricsEvent | DocumentFolderQueryMetricsEvent | DocumentFolderDecodeMetricsEvent | DocumentFolderSuggestMetricsEvent;
 
 interface BaseMetricsEvent {
     ts: Date;
@@ -106,6 +106,13 @@ interface DocumentSummaryUploadMetricsEvent extends BaseMetricsEvent {
 
 interface DocumentFolderQueryMetricsEvent extends BaseMetricsEvent {
     type: 'search';
+    data: {
+        query: string;
+    };
+}
+
+interface DocumentFolderSuggestMetricsEvent extends BaseMetricsEvent {
+    type: 'suggest';
     data: {
         query: string;
     };

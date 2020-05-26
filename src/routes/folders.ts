@@ -122,7 +122,7 @@ export function newFoldersRouter(
     async function getSuggestedFoldersV3(ctx: koa.Context) {
         metricsStorage.log({
             ts: new Date(),
-            type: "search",
+            type: "suggest",
             version: 3,
             user: ctx.state.userId,
             data: {

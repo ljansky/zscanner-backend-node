@@ -86,7 +86,7 @@ describe("Folders/patients tests", () => {
 
             metricsStorage.expectEvent({
                 ts: new Date(),
-                type: "search",
+                type: "suggest",
                 version: 3,
                 user: 'USER',
                 data: {
