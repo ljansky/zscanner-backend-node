@@ -51,7 +51,7 @@ export function newFoldersRouter(
                 return [];
             }
             if (!ctx.query.query.includes('#')) {
-                return documentStorage.findFolders(query);
+                return documentStorage.findFolders(query, ctx.state.userId);
             }
             const folder = await documentStorage.getFolderByBarcode(query);
             return folder ? [ folder ] : [];
@@ -92,7 +92,7 @@ export function newFoldersRouter(
         });
 
         const query = sanitizeQuery(ctx.query.query);
-        ctx.body = query ? await documentStorage.findFolders(query) : [];
+        ctx.body = query ? await documentStorage.findFolders(query, ctx.state.userId) : [];
         ctx.response.status = 200;
         ctx.response.message = 'OK';
     }

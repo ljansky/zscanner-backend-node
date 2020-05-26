@@ -3,7 +3,7 @@ import * as util from 'util';
 
 import { createLogger } from "../../lib/logging";
 import { normalizeString } from "../../lib/utils";
-import { DocumentFolder, DocumentStorage, DocumentSummary, DocumentType, HEALTH_LEVEL_OK } from "../types";
+import { DocumentFolder, DocumentStorage, DocumentSummary, DocumentType, FoundDocumentFolder, HEALTH_LEVEL_OK } from "../types";
 
 const LOG = createLogger(__filename);
 
@@ -29,7 +29,7 @@ export function newDemoDocumentStorage(
         return void 0;
     }
 
-    async function findFolders(query: string): Promise<DocumentFolder[]> {
+    async function findFolders(query: string): Promise<FoundDocumentFolder[]> {
         query = normalizeString(query);
 
         return DEMO_FOLDERS
@@ -59,36 +59,42 @@ export function newDemoDocumentStorage(
 /**
  * This data is completely randomly generated.
  */
-const DEMO_FOLDERS: DocumentFolder[] = [
+const DEMO_FOLDERS: FoundDocumentFolder[] = [
     {
         externalId: '925221/9449',
         internalId: '124587112',
         name: 'Radana Macháčková',
+        type: 'suggestedResult',
     },
     {
         externalId: '011116/0632',
         internalId: '124587113',
         name: 'František Chadima',
+        type: 'suggestedResult',
     },
     {
         externalId: '995507/4789',
         internalId: '124587116',
         name: 'Aneta Šálková',
+        type: 'searchResult',
     },
     {
         externalId: '760623/6979',
         internalId: '124587154',
         name: 'Servác Skoumal',
+        type: 'searchResult',
     },
     {
         externalId: '841206/2483',
         internalId: '124587154',
         name: 'Petr Šmídek',
+        type: 'searchResult',
     },
     {
         externalId: '806007/3351',
         internalId: '124587199',
         name: 'Jiřina Hozová',
+        type: 'searchResult',
     },
 ];
 
