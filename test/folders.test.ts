@@ -1,7 +1,7 @@
 import request = require('supertest');
 
 import { newDemoDocumentStorage } from "../src/services/document-storages/demo";
-import { DocumentFolder } from "../src/services/types";
+import { DocumentFolder, FoundDocumentFolder } from "../src/services/types";
 
 import { newMockMetricsStorage, newStaticAuthenticator, withApplication } from "./common";
 
@@ -51,6 +51,7 @@ describe("Folders/patients tests", () => {
                     externalId: 'EXTERNAL-ID',
                     internalId: 'INTERNAL-ID',
                     name: 'THE-NAME',
+                    type: 'searchResult',
                 },
             ]);
 
@@ -152,13 +153,14 @@ describe("Folders/patients tests", () => {
 
 const MOCK_DOCUMENT_STORAGE = {
     ...newDemoDocumentStorage({}),
-    async findFolders(query: string): Promise<DocumentFolder[]> {
+    async findFolders(query: string): Promise<FoundDocumentFolder[]> {
         expect(query).toEqual("QUERY");
         return [
             {
                 name: 'THE-NAME',
                 externalId: 'EXTERNAL-ID',
                 internalId: 'INTERNAL-ID',
+                type: 'searchResult',
             },
         ];
     },

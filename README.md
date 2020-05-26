@@ -41,11 +41,13 @@
           externalId: '925221/9449',
           internalId: '124587112',
           name: 'Radana Macháčková',
+          type: 'suggestedResult'
       },
       {
           externalId: '011116/0632',
           internalId: '124587113',
           name: 'František Machajda',
+          type: 'searchResult'
       },
       ...
   ]

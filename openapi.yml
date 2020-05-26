@@ -126,11 +126,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DocumentFolder'
+                  $ref: '#/components/schemas/FoundDocumentFolder'
               example: 
                 [
-                  { "externalId": "925221/9449", "internalId": "124587112", "name": "Fiona Shreková" },
-                  { "externalId": "011116/0632", "internalId": "124587113", "name": "Šípková Růženka" }
+                  { "externalId": "925221/9449", "internalId": "124587112", "name": "Fiona Shreková", "type": "suggestedResult" },
+                  { "externalId": "011116/0632", "internalId": "124587113", "name": "Šípková Růženka", "type": "searchResult" }
                 ]
             
   /v3/folders/decode:
@@ -206,3 +206,22 @@ components:
         - internalId
         - name
 
+    FoundDocumentFolder:
+      type: object
+      properties:
+        externalId:
+          type: string
+        internalId:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+            - searchResult
+            - suggestedResult
+      required:
+        - externalId
+        - internalId
+        - name
+        - type

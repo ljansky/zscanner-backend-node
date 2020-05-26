@@ -22,7 +22,7 @@ export interface Authenticator extends HealthConscious {
 export interface DocumentStorage extends HealthConscious {
     initialize(): Promise<void>;
 
-    findFolders(query: string): Promise<DocumentFolder[]>;
+    findFolders(query: string, user: string): Promise<FoundDocumentFolder[]>;
     getFolderByBarcode(folderBarcode: string): Promise<DocumentFolder | undefined>;
 
     getDocumentTypes(): Promise<DocumentType[]>;
@@ -42,6 +42,12 @@ export interface DocumentFolder {
     externalId: string;
     internalId: string;
     name: string;
+}
+
+export type FoundType = 'searchResult' | 'suggestedResult';
+
+export interface FoundDocumentFolder extends DocumentFolder {
+    type: FoundType;
 }
 
 export interface Patient {
