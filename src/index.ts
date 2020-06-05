@@ -3,9 +3,10 @@ import { config } from './lib/config';
 import { createLogger } from "./lib/logging";
 import { newNoopAuthenticator } from "./services/authenticators/noop";
 import { newSeacatAuthenticator } from "./services/authenticators/seacat";
+import { newDemoBodyPartsStorage } from './services/body-parts-storages/demo';
 import { newDemoDocumentStorage } from "./services/document-storages/demo";
 import { newNoopMetricsStorage } from "./services/metrics-storages/noop";
-import { Authenticator, DocumentStorage, Uploader } from "./services/types";
+import { Authenticator, BodyPartsStorage, DocumentStorage, Uploader } from "./services/types";
 import { newTusStore, newTusUploader } from "./services/uploader/tus-uploader";
 
 const LOG = createLogger(__filename);
@@ -24,6 +25,9 @@ async function start() {
     const documentStorage = constructDocumentStorage();
     await documentStorage.initialize();
 
+    const bodyPartsStorage = constructBodyPartsStorage();
+    await bodyPartsStorage.initialize();
+
     const metricsStorage = constructMetricsStorage();
     await metricsStorage.initialize();
 
@@ -34,6 +38,7 @@ async function start() {
         documentStorage,
         metricsStorage,
         uploader,
+        bodyPartsStorage,
     });
 
     app.listen(config.PORT, () => LOG.info(`Listening on port ${config.PORT}...`));
@@ -57,6 +62,10 @@ function constructAuthenticator(): Authenticator {
 
 function constructDocumentStorage(): DocumentStorage {
     return newDemoDocumentStorage({});
+}
+
+function constructBodyPartsStorage(): BodyPartsStorage {
+    return newDemoBodyPartsStorage({});
 }
 
 function constructMetricsStorage(): MetricsStorage {

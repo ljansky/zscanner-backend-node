@@ -30,15 +30,15 @@
        http://localhost:10805/api-zscanner/v3/documenttypes
 ```
 
-### Request BodyParts images
+### Request BodyParts views
 
 ```
-  GET /api-zscanner/v3/bodyparts-images
+  GET /api-zscanner/v3/bodyparts/views
 
   200 OK
     [
         {
-            "url": "http://localhost/head.png",
+            "imageUrl": "http://localhost/head.png",
             "bodyParts":
                 [
                     {
@@ -54,7 +54,7 @@
                 ]
         },
         {
-            "url": "http://localhost/hand.png",
+            "imageUrl": "http://localhost/hand.png",
             "bodyParts":
                 [
                     {

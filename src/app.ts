@@ -4,12 +4,13 @@ import { default as json } from "koa-json";
 
 import { createLogger } from "./lib/logging";
 import { time, KoaNextFunction } from "./lib/utils";
+import { newBodyPartsRouter } from './routes/bodyparts';
 import { newDocumentsRouter } from "./routes/documents";
 import { newDocumentTypesRouter } from "./routes/documenttypes";
 import { newFoldersRouter } from "./routes/folders";
 import { newHealthCheckRouter } from "./routes/healthcheck";
 import { newUploadRouter } from "./routes/upload";
-import { Authenticator, DocumentStorage, MetricsStorage, Uploader } from "./services/types";
+import { Authenticator, BodyPartsStorage, DocumentStorage, MetricsStorage, Uploader } from "./services/types";
 
 export { config } from "./lib/config";
 export { createLogger } from "./lib/logging";
@@ -20,6 +21,7 @@ export { newNoopMetricsStorage } from "./services/metrics-storages/noop";
 export { newSeacatAuthenticator } from "./services/authenticators/seacat";
 export { newDemoDocumentStorage } from "./services/document-storages/demo";
 export { newTusUploader, newTusStore } from './services/uploader/tus-uploader';
+export { newDemoBodyPartsStorage } from './services/body-parts-storages/demo';
 
 const onerror = require('koa-onerror');
 
@@ -31,11 +33,13 @@ export function constructKoaApplication(
         documentStorage,
         metricsStorage,
         uploader,
+        bodyPartsStorage,
     }: {
         authenticator: Authenticator,
         documentStorage: DocumentStorage,
         metricsStorage: MetricsStorage,
         uploader: Uploader,
+        bodyPartsStorage: BodyPartsStorage,
     }) {
 
     const app = new Koa();
@@ -49,10 +53,12 @@ export function constructKoaApplication(
         const documentTypesRouter = newDocumentTypesRouter({ documentStorage });
         const healthCheckRouter = newHealthCheckRouter({ components: [documentStorage, authenticator, metricsStorage] });
         const uploadRouter = newUploadRouter({ uploader });
+        const bodyPartsRouter = newBodyPartsRouter({ bodyPartsStorage });
 
         app.use(documentsRouter.routes());
         app.use(foldersRouter.routes());
         app.use(documentTypesRouter.routes());
+        app.use(bodyPartsRouter.routes());
         app.use(healthCheckRouter.routes());
         app.use(uploadRouter.routes());
     }

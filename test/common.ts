@@ -7,14 +7,15 @@ import { DataStore, EVENTS } from 'tus-node-server';
 
 import {
     constructKoaApplication,
-    newDemoDocumentStorage, newNoopAuthenticator,
+    newDemoBodyPartsStorage, newDemoDocumentStorage,
+    newNoopAuthenticator,
     HEALTH_LEVEL_OK,
     MetricsEvent,
     MetricsStorage,
 } from "../src/app";
 import { disableLogging } from "../src/lib/logging";
 import { newNoopMetricsStorage } from "../src/services/metrics-storages/noop";
-import { Authenticator, DocumentStorage, TusUploaderMetadata, Uploader } from "../src/services/types";
+import { Authenticator, BodyPartsStorage, DocumentStorage, TusUploaderMetadata, Uploader } from "../src/services/types";
 import { newTusUploader } from "../src/services/uploader/tus-uploader";
 
 disableLogging();
@@ -113,6 +114,7 @@ export async function withApplication<T>(
     {
         authenticator,
         documentStorage,
+        bodyPartsStorage,
         metricsStorage,
         uploader,
         patcher,
@@ -120,6 +122,7 @@ export async function withApplication<T>(
     }: {
         authenticator?: Authenticator,
         documentStorage?: DocumentStorage,
+        bodyPartsStorage?: BodyPartsStorage,
         metricsStorage?: MetricsStorage,
         uploader?: Uploader,
         patcher?: (app: koa) => void,
@@ -129,6 +132,7 @@ export async function withApplication<T>(
 ): Promise<T> {
     authenticator = authenticator || newNoopAuthenticator();
     documentStorage = documentStorage || newDemoDocumentStorage({});
+    bodyPartsStorage = bodyPartsStorage || newDemoBodyPartsStorage({});
     metricsStorage = metricsStorage || newNoopMetricsStorage();
     uploader = uploader || newMockTusUploader();
     await authenticator.initialize();
@@ -137,6 +141,7 @@ export async function withApplication<T>(
     const app = constructKoaApplication({
         authenticator,
         documentStorage,
+        bodyPartsStorage,
         metricsStorage,
         uploader,
     });

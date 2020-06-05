@@ -155,25 +155,25 @@ paths:
               example:
                 { "externalId": "925221/9449", "internalId": "124587112", "name": "Fiona Shreková" }
 
-  /v3/bodyparts-images:
+  /v3/bodyparts/views:
     get:
-      summary: Get list of bodyparts images
+      summary: Get list of bodyparts views
       operationId: getBodyparts
       responses:
         200:
           description: |
-            Get list of informations about bodyparts images. Every image info has url, where it can be downloaded,
+            Get list of informations about bodyparts views. Every view info has image url, where it can be downloaded,
             and list of its bodyparts with coordinates and name
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/BodyPartsImage'
+                  $ref: '#/components/schemas/BodyPartsView'
               example: 
                 [
                   {
-                    "url": "http://localhost/head.png",
+                    "imageUrl": "http://localhost/head.png",
                     "bodyParts":
                       [
                         {
@@ -189,7 +189,7 @@ paths:
                       ]
                   },
                   {
-                    "url": "http://localhost/hand.png",
+                    "imageUrl": "http://localhost/hand.png",
                     "bodyParts":
                       [
                         {
@@ -272,17 +272,17 @@ components:
         - name
         - type
 
-    BodyPartsImage:
+    BodyPartsView:
       type: object
       properties:
-        url:
+        imageUrl:
           type: string
         bodyParts:
           type: array
           items:
             $ref: '#/components/schemas/BodyPart'
       required:
-        - url
+        - imageUrl
         - bodyParts
 
     BodyPart:
