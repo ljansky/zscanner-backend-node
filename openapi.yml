@@ -162,8 +162,8 @@ paths:
       responses:
         200:
           description: |
-            Get list of informations about bodyparts views. Every view info has image url, where it can be downloaded,
-            and list of its bodyparts with coordinates and name
+            Get list of informations about bodyparts views.
+            Every view has id, which can be used to download view image and list of its bodyparts with coordinates and name.
           content:
             application/json:
               schema:
