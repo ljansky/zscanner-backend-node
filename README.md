@@ -30,6 +30,48 @@
        http://localhost:10805/api-zscanner/v3/documenttypes
 ```
 
+### Request BodyParts images
+
+```
+  GET /api-zscanner/v3/bodyparts-images
+
+  200 OK
+    [
+        {
+            "url": "http://localhost/head.png",
+            "bodyParts":
+                [
+                    {
+                        "id": "leftEye",
+                        "name": "Left eye",
+                        "coordinates": [0.2, 0.2]
+                    },
+                    {
+                        "id": "rightEye",
+                        "name": "Right eye",
+                        "coordinates": [0.8, 0.2]
+                    }
+                ]
+        },
+        {
+            "url": "http://localhost/hand.png",
+            "bodyParts":
+                [
+                    {
+                        "id": "finger",
+                        "name": "Finger",
+                        "coordinates": [0.1, 0.1]
+                    }
+                ]
+        }
+    ]
+```
+
+```
+  curl -v -v \
+       http://localhost:10805/api-zscanner/v3/documenttypes
+```
+
 ### Request Folders by Query
 
 ```
