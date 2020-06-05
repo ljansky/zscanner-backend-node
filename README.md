@@ -168,7 +168,7 @@ PATCH request to url from Location header of POST request
   200 OK
     [
         {
-            "imageUrl": "http://localhost/head.png",
+            "id": "1",
             "bodyParts":
                 [
                     {
@@ -184,7 +184,7 @@ PATCH request to url from Location header of POST request
                 ]
         },
         {
-            "imageUrl": "http://localhost/hand.png",
+            "id": "2",
             "bodyParts":
                 [
                     {

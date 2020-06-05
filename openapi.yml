@@ -173,7 +173,7 @@ paths:
               example: 
                 [
                   {
-                    "imageUrl": "http://localhost/head.png",
+                    "id": "1",
                     "bodyParts":
                       [
                         {
@@ -189,7 +189,7 @@ paths:
                       ]
                   },
                   {
-                    "imageUrl": "http://localhost/hand.png",
+                    "id": "2",
                     "bodyParts":
                       [
                         {
@@ -288,14 +288,14 @@ components:
     BodyPartsView:
       type: object
       properties:
-        imageUrl:
+        id:
           type: string
         bodyParts:
           type: array
           items:
             $ref: '#/components/schemas/BodyPart'
       required:
-        - imageUrl
+        - id
         - bodyParts
 
     BodyPart:

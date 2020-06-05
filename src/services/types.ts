@@ -146,12 +146,18 @@ export interface BodyPart {
 }
 
 export interface BodyPartsView {
-    imageUrl: string;
+    id: string;
     bodyParts: BodyPart[];
+}
+
+export interface ImageData {
+    data: any;
+    type: string;
 }
 
 export interface BodyPartsStorage extends HealthConscious {
     initialize(): Promise<void>;
 
     getBodyPartsViews(): Promise<BodyPartsView[]>;
+    getBodyPartsViewImage(id: string): Promise<ImageData | null>;
 }

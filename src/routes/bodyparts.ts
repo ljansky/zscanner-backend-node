@@ -20,6 +20,7 @@ export function newBodyPartsRouter(
     router.prefix(config.ROUTER_PREFIX);
 
     router.get('/v3/bodyparts/views', wrapRouteWithErrorHandler(LOG, getBodyPartsViews));
+    router.get('/v3/bodyparts/views/:id/image', wrapRouteWithErrorHandler(LOG, getBodyPartViewImage));
 
     return router;
 
@@ -27,5 +28,18 @@ export function newBodyPartsRouter(
         ctx.body = await bodyPartsStorage.getBodyPartsViews();
         ctx.response.status = 200;
         ctx.response.message = `OK`;
+    }
+
+    async function getBodyPartViewImage(ctx: koa.Context) {
+        const id = ctx.params.id;
+        const image = await bodyPartsStorage.getBodyPartsViewImage(id);
+        if (image) {
+            ctx.body = image.data;
+            ctx.type = image.type;
+            ctx.response.status = 200;
+            ctx.response.message = `OK`;
+        } else {
+            ctx.response.status = 404;
+        }
     }
 }

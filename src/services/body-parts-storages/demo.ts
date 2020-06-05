@@ -1,4 +1,4 @@
-import { BodyPartsStorage, BodyPartsView , HEALTH_LEVEL_OK } from "../types";
+import { BodyPartsStorage, BodyPartsView, HEALTH_LEVEL_OK, ImageData } from "../types";
 
 export function newDemoBodyPartsStorage(
     {
@@ -7,6 +7,7 @@ export function newDemoBodyPartsStorage(
     return {
         initialize,
         getBodyPartsViews,
+        getBodyPartsViewImage,
         getHealth: () => ({ level: HEALTH_LEVEL_OK, messages: [] }),
     };
 
@@ -17,6 +18,18 @@ export function newDemoBodyPartsStorage(
     async function getBodyPartsViews(): Promise<BodyPartsView[]> {
         return DEMO_BODY_PARTS_VIEWS;
     }
+
+    async function getBodyPartsViewImage(id: string): Promise<ImageData | null> {
+        const parsedId = parseInt(id, 10);
+        if (typeof DEMO_BODY_PARTS_IMAGES[parsedId] !== 'undefined') {
+            return {
+                data: Buffer.from(DEMO_BODY_PARTS_IMAGES[parsedId], 'base64'),
+                type: 'image/png',
+            };
+        }
+
+        return null;
+    }
 }
 
 /**
@@ -25,7 +38,7 @@ export function newDemoBodyPartsStorage(
 
 export const DEMO_BODY_PARTS_VIEWS: BodyPartsView[] = [
     {
-        imageUrl: 'http://localhost/head.png',
+        id: '0',
         bodyParts:
           [
             {
@@ -41,7 +54,7 @@ export const DEMO_BODY_PARTS_VIEWS: BodyPartsView[] = [
           ],
       },
       {
-        imageUrl: 'http://localhost/hand.png',
+        id: '1',
         bodyParts:
           [
             {
@@ -51,4 +64,9 @@ export const DEMO_BODY_PARTS_VIEWS: BodyPartsView[] = [
             },
           ],
       },
+];
+
+export const DEMO_BODY_PARTS_IMAGES: string[] = [
+    'iVBORw0KGgoAAAANSUhEUgAAADIAAABQCAIAAADUYbG3AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5AYFEB0bkLDwJgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAUUlEQVRo3u3OAQ0AMAgAIH0HC9k/iDFeQzdIQNZ07PNiJS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0trSutD7ycAd8tQKR+AAAAAElFTkSuQmCC',
+    'iVBORw0KGgoAAAANSUhEUgAAADIAAABQCAIAAADUYbG3AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5AYFECgl8+AvOwAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAS0lEQVRo3u3OMQEAAAgDoGn/zhrCxwMSUJOPOlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWloHC/GUAZ8PdWxCAAAAAElFTkSuQmCC',
 ];
