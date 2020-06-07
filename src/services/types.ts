@@ -138,3 +138,26 @@ export interface TusUploaderMetadata {
 }
 
 export type TusUploaderEventHandler = (metadata: TusUploaderMetadata) => void;
+
+export interface BodyPart {
+    id: string;
+    name: string;
+    coordinates: [number, number];
+}
+
+export interface BodyPartsView {
+    id: string;
+    bodyParts: BodyPart[];
+}
+
+export interface ImageData {
+    data: any;
+    type: string;
+}
+
+export interface BodyPartsStorage extends HealthConscious {
+    initialize(): Promise<void>;
+
+    getBodyPartsViews(): Promise<BodyPartsView[]>;
+    getBodyPartsViewImage(id: string): Promise<ImageData | null>;
+}

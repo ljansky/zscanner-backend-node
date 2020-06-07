@@ -159,3 +159,59 @@ PATCH request to url from Location header of POST request
     Upload-Offset: 0
   And data in Request Payload
 ```
+
+### Request BodyParts views
+
+```
+  GET /api-zscanner/v3/bodyparts/views
+
+  200 OK
+    [
+        {
+            "id": "1",
+            "bodyParts":
+                [
+                    {
+                        "id": "leftEye",
+                        "name": "Left eye",
+                        "coordinates": [0.2, 0.2]
+                    },
+                    {
+                        "id": "rightEye",
+                        "name": "Right eye",
+                        "coordinates": [0.8, 0.2]
+                    }
+                ]
+        },
+        {
+            "id": "2",
+            "bodyParts":
+                [
+                    {
+                        "id": "finger",
+                        "name": "Finger",
+                        "coordinates": [0.1, 0.1]
+                    }
+                ]
+        }
+    ]
+```
+
+```
+  curl -v -v \
+       http://localhost:10805/api-zscanner/v3/bodyparts/views
+```
+
+### Request BodyParts view image
+
+```
+  GET /api-zscanner/v3/bodyparts/views/:id/image
+
+  Get binary data of image (where :id is id of view)
+```
+
+
+```
+  curl -v -v \
+       http://localhost:10805/api-zscanner/v3/bodyparts/views/1/image
+```
