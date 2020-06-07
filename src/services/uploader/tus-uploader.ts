@@ -61,7 +61,7 @@ export function newTusUploader({
     });
 
     const validationMiddleware: Koa.Middleware = async (ctx, next) => {
-        if (ctx.request.method === 'POST') {
+        if (ctx.request.headers['x-http-method-override'] ? ctx.request.headers['x-http-method-override'].toUpperCase() === 'POST' : ctx.request.method === 'POST') {
             const uploadMetadata = ctx.request.header['upload-metadata'];
             if (!uploadMetadata) {
                 throw new HttpError('Missing metadata', 400);
