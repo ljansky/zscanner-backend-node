@@ -215,3 +215,28 @@ PATCH request to url from Location header of POST request
   curl -v -v \
        http://localhost:10805/api-zscanner/v3/bodyparts/views/1/image
 ```
+
+### Request folder defects
+
+```
+  GET /api-zscanner/v3/folders/:folderId/defects
+
+  200 OK
+    [
+        {
+            "id": "defect1",
+            "name": "Name of defect 1",
+            "bodyPartId": "leftEye"
+        },
+        {
+            "id": "defect2",
+            "name": "Name of defect 2",
+            "bodyPartId": "finger"
+        }
+    ]
+```
+
+```
+  curl -v -v \
+       http://localhost:10805/api-zscanner/v3/folders/1/defects
+```

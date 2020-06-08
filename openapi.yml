@@ -214,6 +214,34 @@ paths:
                 type: string
                 format: binary
 
+  /v3/folders/:folderId/defects:
+    get:
+      summary: Get defects of folder by folderId
+      operationId: getFolderDefects
+      responses:
+        200:
+          description: |
+            Get defects of folder by folderId, bodyPartId is unique in whole body,
+            so it also identifies view, where the bodyPart is visible.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FolderDefect'
+              example: 
+                [
+                  {
+                    "id": "defect1",
+                    "name": "Name of defect 1",
+                    "bodyPartId": "leftEye"
+                  },
+                  {
+                    "id": "defect2",
+                    "name": "Name of defect 2",
+                    "bodyPartId": "finger"
+                  }
+                ]
 components:
   schemas:
     DocumentType:
@@ -315,3 +343,17 @@ components:
         - id
         - name
         - coordinates
+
+    FolderDefect:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        bodyPartId:
+          type: string
+      required:
+        - id
+        - name
+        - bodyPartId
