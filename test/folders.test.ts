@@ -149,6 +149,35 @@ describe("Folders/patients tests", () => {
             });
         });
     });
+
+    test(`Check that getting folder defects /v3 bubbles to document storage and returns correct result`, async () => {
+        const metricsStorage = newMockMetricsStorage();
+        await withApplication({
+            authenticator: newStaticAuthenticator(),
+            documentStorage: MOCK_DOCUMENT_STORAGE,
+            metricsStorage,
+        }, async (server) => {
+            const response = await request(server).get(`/api-zscanner/v3/folders/124587113/defects`);
+            expect(response.status).toEqual(200);
+            expect(response.body).toEqual([
+                {
+                    defectId: 'defect3',
+                    bodyPartId: 'leftEye',
+                    name: 'Name of defect 3',
+                },
+            ]);
+
+            metricsStorage.expectEvent({
+                ts: new Date(),
+                type: "getDefects",
+                version: 3,
+                user: 'USER',
+                data: {
+                    folderId: '124587113',
+                },
+            });
+        });
+    });
 });
 
 const MOCK_DOCUMENT_STORAGE = {

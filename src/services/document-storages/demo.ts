@@ -3,7 +3,7 @@ import * as util from 'util';
 
 import { createLogger } from "../../lib/logging";
 import { normalizeString } from "../../lib/utils";
-import { DocumentFolder, DocumentStorage, DocumentSummary, DocumentType, FoundDocumentFolder, HEALTH_LEVEL_OK } from "../types";
+import { DocumentFolder, DocumentStorage, DocumentSummary, DocumentType, FolderDefect, FoundDocumentFolder, HEALTH_LEVEL_OK } from "../types";
 
 const LOG = createLogger(__filename);
 
@@ -22,6 +22,7 @@ export function newDemoDocumentStorage(
         submitDocumentPage,
         submitLargeDocumentPage: submitDocumentPage,
         submitDocumentSummary,
+        getDefectsByFolderId,
         getHealth: () => ({ level: HEALTH_LEVEL_OK, messages: [] }),
     };
 
@@ -53,6 +54,11 @@ export function newDemoDocumentStorage(
     async function submitDocumentPage(correlationId: string, pageIndex: number, file: string): Promise<void> {
         const s = await stat(file);
         LOG.info(`Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${file} (${s.size} bytes)`);
+    }
+
+    async function getDefectsByFolderId(folderId: string): Promise<FolderDefect[] | undefined> {
+        const result = DEMO_FOLDER_DEFECTS.find((f) => f.folderId === folderId);
+        return result ? result.defects : undefined;
     }
 }
 
@@ -134,5 +140,38 @@ export const DEMO_DOCUMENT_TYPES: DocumentType[] = [
         mode: 'exam',
         display: 'Výsledky sonografického vyšetření',
         type: 'sono-results',
+    },
+];
+
+interface DemoFolderDefects {
+    folderId: string;
+    defects: FolderDefect[];
+}
+
+export const DEMO_FOLDER_DEFECTS: DemoFolderDefects[] = [
+    {
+        folderId: '124587112',
+        defects: [
+            {
+                defectId: 'defect1',
+                bodyPartId: 'rightEye',
+                name: 'Name of defect 1',
+            },
+            {
+                defectId: 'defect2',
+                bodyPartId: 'finger',
+                name: 'Name of defect 2',
+            },
+        ],
+    },
+    {
+        folderId: '124587113',
+        defects: [
+            {
+                defectId: 'defect3',
+                bodyPartId: 'leftEye',
+                name: 'Name of defect 3',
+            },
+        ],
     },
 ];

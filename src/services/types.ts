@@ -30,6 +30,8 @@ export interface DocumentStorage extends HealthConscious {
     submitDocumentPage(correlationId: string, pageIndex: number, file: string): Promise<void>;
     submitLargeDocumentPage(correlationId: string, pageIndex: number, file: string, contentType: string): Promise<void>;
     submitDocumentSummary(correlationId: string, summary: DocumentSummary): Promise<void>;
+
+    getDefectsByFolderId(folderId: string): Promise<FolderDefect[] | undefined>;
 }
 
 export interface MetricsStorage extends HealthConscious {
@@ -86,7 +88,13 @@ export interface PatientDocumentSummary {
     user: string;
 }
 
-export type MetricsEvent = DocumentSummaryUploadMetricsEvent | DocumentFolderQueryMetricsEvent | DocumentFolderDecodeMetricsEvent;
+export interface FolderDefect {
+    defectId: string;
+    bodyPartId: string;
+    name: string;
+}
+
+export type MetricsEvent = DocumentSummaryUploadMetricsEvent | DocumentFolderQueryMetricsEvent | DocumentFolderDecodeMetricsEvent | DocumentFolderGetDefectsMetricsEvent;
 
 interface BaseMetricsEvent {
     ts: Date;
@@ -116,6 +124,13 @@ interface DocumentFolderDecodeMetricsEvent extends BaseMetricsEvent {
     type: 'decode';
     data: {
         query: string;
+    };
+}
+
+interface DocumentFolderGetDefectsMetricsEvent extends BaseMetricsEvent {
+    type: 'getDefects';
+    data: {
+        folderId: string;
     };
 }
 
