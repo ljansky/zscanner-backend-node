@@ -201,12 +201,12 @@ paths:
                   },
                 ]
   
-  /v3/bodyparts/views/{id}/image:
+  /v3/bodyparts/views/{viewId}/image:
     get:
       summary: Get image for view
       operationId: getBodypartsViewImage
       parameters:
-        - name: id
+        - name: viewId
           in: path
           required: true
           schema:
@@ -221,12 +221,12 @@ paths:
                 type: string
                 format: binary
 
-  /v3/folders/{id}/defects:
+  /v3/folders/{folderId}/defects:
     get:
       summary: Get defects of folder by folderId
       operationId: getFolderDefects
       parameters:
-        - name: id
+        - name: folderId
           in: path
           required: true
           schema:

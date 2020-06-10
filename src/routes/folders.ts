@@ -26,7 +26,7 @@ export function newFoldersRouter(
     router.get('/v2/patients/decode', wrapRouteWithErrorHandler(LOG, getPatientByBarcodeV1V2));
     router.get('/v3/folders/search', wrapRouteWithErrorHandler(LOG, getFoldersV3));
     router.get('/v3/folders/decode', wrapRouteWithErrorHandler(LOG, getFolderByBarcodeV3));
-    router.get('/v3/folders/:id/defects', wrapRouteWithErrorHandler(LOG, getFolderDefectsV3));
+    router.get('/v3/folders/:folderId/defects', wrapRouteWithErrorHandler(LOG, getFolderDefectsV3));
 
     return router;
 
@@ -120,7 +120,7 @@ export function newFoldersRouter(
     }
 
     async function getFolderDefectsV3(ctx: koa.Context) {
-        const folderId = ctx.params.id;
+        const folderId = ctx.params.folderId;
 
         metricsStorage.log({
             ts: new Date(),
