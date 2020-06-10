@@ -19,8 +19,8 @@ export function newDemoBodyPartsStorage(
         return DEMO_BODY_PARTS_VIEWS;
     }
 
-    async function getBodyPartsViewImage(id: string): Promise<ImageData | null> {
-        const parsedId = parseInt(id, 10);
+    async function getBodyPartsViewImage(viewId: string): Promise<ImageData | null> {
+        const parsedId = parseInt(viewId, 10);
         if (typeof DEMO_BODY_PARTS_IMAGES[parsedId] !== 'undefined') {
             return {
                 data: Buffer.from(DEMO_BODY_PARTS_IMAGES[parsedId], 'base64'),

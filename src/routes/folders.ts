@@ -26,6 +26,7 @@ export function newFoldersRouter(
     router.get('/v2/patients/decode', wrapRouteWithErrorHandler(LOG, getPatientByBarcodeV1V2));
     router.get('/v3/folders/search', wrapRouteWithErrorHandler(LOG, getFoldersV3));
     router.get('/v3/folders/decode', wrapRouteWithErrorHandler(LOG, getFolderByBarcodeV3));
+    router.get('/v3/folders/:folderId/defects', wrapRouteWithErrorHandler(LOG, getFolderDefectsV3));
 
     return router;
 
@@ -110,6 +111,26 @@ export function newFoldersRouter(
 
         const query = sanitizeQuery(ctx.query.query);
         const response = query ? await documentStorage.getFolderByBarcode(query) : undefined;
+        if (response) {
+            ctx.response.body = response;
+            ctx.response.status = 200;
+        } else {
+            ctx.response.status = 404;
+        }
+    }
+
+    async function getFolderDefectsV3(ctx: koa.Context) {
+        const folderId = ctx.params.folderId;
+
+        metricsStorage.log({
+            ts: new Date(),
+            type: "getDefects",
+            version: 3,
+            user: ctx.state.userId,
+            data: { folderId },
+        });
+
+        const response = await documentStorage.getDefectsByFolderId(folderId);
         if (response) {
             ctx.response.body = response;
             ctx.response.status = 200;

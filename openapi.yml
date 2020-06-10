@@ -201,10 +201,17 @@ paths:
                   },
                 ]
   
-  /v3/bodyparts/views/:id/image:
+  /v3/bodyparts/views/{viewId}/image:
     get:
       summary: Get image for view
       operationId: getBodypartsViewImage
+      parameters:
+        - name: viewId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Id of view for which the image will be downloaded
       responses:
         200:
           description: Get image for view
@@ -214,6 +221,41 @@ paths:
                 type: string
                 format: binary
 
+  /v3/folders/{folderId}/defects:
+    get:
+      summary: Get defects of folder by folderId
+      operationId: getFolderDefects
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Id of folder, for which we want to get defects
+      responses:
+        200:
+          description: |
+            Get defects of folder by folderId, bodyPartId is unique in whole body,
+            so it also identifies view, where the bodyPart is visible.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FolderDefect'
+              example: 
+                [
+                  {
+                    "id": "defect1",
+                    "name": "Name of defect 1",
+                    "bodyPartId": "leftEye"
+                  },
+                  {
+                    "id": "defect2",
+                    "name": "Name of defect 2",
+                    "bodyPartId": "finger"
+                  }
+                ]
 components:
   schemas:
     DocumentType:
@@ -315,3 +357,17 @@ components:
         - id
         - name
         - coordinates
+
+    FolderDefect:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        bodyPartId:
+          type: string
+      required:
+        - id
+        - name
+        - bodyPartId

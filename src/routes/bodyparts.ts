@@ -20,7 +20,7 @@ export function newBodyPartsRouter(
     router.prefix(config.ROUTER_PREFIX);
 
     router.get('/v3/bodyparts/views', wrapRouteWithErrorHandler(LOG, getBodyPartsViews));
-    router.get('/v3/bodyparts/views/:id/image', wrapRouteWithErrorHandler(LOG, getBodyPartViewImage));
+    router.get('/v3/bodyparts/views/:viewId/image', wrapRouteWithErrorHandler(LOG, getBodyPartViewImage));
 
     return router;
 
@@ -31,8 +31,8 @@ export function newBodyPartsRouter(
     }
 
     async function getBodyPartViewImage(ctx: koa.Context) {
-        const id = ctx.params.id;
-        const image = await bodyPartsStorage.getBodyPartsViewImage(id);
+        const viewId = ctx.params.viewId;
+        const image = await bodyPartsStorage.getBodyPartsViewImage(viewId);
         if (image) {
             ctx.body = image.data;
             ctx.type = image.type;
