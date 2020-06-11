@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import request = require('supertest');
 
 import { newDemoDocumentStorage } from "../src/services/document-storages/demo";
-import { DocumentSummary, PageUploadInfo, PageWithDefectUploadInfo } from "../src/services/types";
+import { DocumentSummary, FolderDefect, PageUploadInfo, PageWithDefectUploadInfo } from "../src/services/types";
 
 import { newMockMetricsStorage, newStaticAuthenticator, newTusUploadClient, withApplication } from "./common";
 
@@ -246,6 +246,56 @@ describe("Documents tests", () => {
                 expect(createResponseWithoutFiletype.status).toEqual(400);
             });
     });
+
+    test('Check that page upload with defect bubbles to document storage', async () => {
+        const storage = newMockDocumentStorage();
+        await withApplication({
+                documentStorage: storage,
+            }, async (server) => {
+                const uploadClient = newTusUploadClient(server);
+                const url = '/api-zscanner/upload';
+                const data = Buffer.from([1, 2, 3]);
+                const defect: FolderDefect = {
+                    defectId: 'defect1',
+                    name: 'Defect name',
+                    bodyPartId: 'bodyPart1',
+                };
+                const createResponse = await uploadClient.create({
+                    url,
+                    data,
+                    metadata: {
+                        uploadType: 'pageWithDefect',
+                        correlation: 'CORRELATION',
+                        pageIndex: '1',
+                        filetype: 'test',
+                        defectId: defect.defectId,
+                        defectName: defect.name,
+                        bodyPartId: defect.bodyPartId,
+                    },
+                });
+
+                expect(createResponse.status).toEqual(201);
+
+                const writeResponse = await uploadClient.write({ url, createResponse, data });
+
+                expect(writeResponse.status).toEqual(204);
+                expect(storage.postedSummaries.length).toEqual(0);
+                expect(storage.postedPages).toEqual([
+                    {
+                        correlationId: "CORRELATION",
+                        pageIndex: 1,
+                        file: data.toString('hex'),
+                    },
+                ]);
+                expect(storage.postedDefects).toEqual([
+                    {
+                        correlationId: "CORRELATION",
+                        pageIndex: 1,
+                        defect,
+                    },
+                ]);
+            });
+    });
 });
 
 function newMockDocumentStorage() {
@@ -262,6 +312,7 @@ function newMockDocumentStorage() {
         submitLargeDocumentPageWithDefect,
         postedSummaries: [] as any[],
         postedPages: [] as any[],
+        postedDefects: [] as any[],
     };
     return c;
 
@@ -279,5 +330,10 @@ function newMockDocumentStorage() {
 
     async function submitLargeDocumentPageWithDefect(correlationId: string, pageIndex: number, uploadInfo: PageWithDefectUploadInfo): Promise<void> {
         submitDocumentPage(correlationId, pageIndex, uploadInfo.filePath);
+        c.postedDefects.push({
+            correlationId,
+            pageIndex,
+            defect: uploadInfo.defect,
+        });
     }
 }
