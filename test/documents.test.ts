@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import request = require('supertest');
 
 import { newDemoDocumentStorage } from "../src/services/document-storages/demo";
-import { DocumentSummary } from "../src/services/types";
+import { DocumentSummary, PageUploadInfo, PageWithDefectUploadInfo } from "../src/services/types";
 
 import { newMockMetricsStorage, newStaticAuthenticator, newTusUploadClient, withApplication } from "./common";
 
@@ -258,7 +258,8 @@ function newMockDocumentStorage() {
             });
         },
         submitDocumentPage,
-        submitLargeDocumentPage: submitDocumentPage,
+        submitLargeDocumentPage,
+        submitLargeDocumentPageWithDefect,
         postedSummaries: [] as any[],
         postedPages: [] as any[],
     };
@@ -270,5 +271,13 @@ function newMockDocumentStorage() {
             pageIndex,
             file: fs.readFileSync(file).toString("hex"),
         });
+    }
+
+    async function submitLargeDocumentPage(correlationId: string, pageIndex: number, uploadInfo: PageUploadInfo): Promise<void> {
+        submitDocumentPage(correlationId, pageIndex, uploadInfo.filePath);
+    }
+
+    async function submitLargeDocumentPageWithDefect(correlationId: string, pageIndex: number, uploadInfo: PageWithDefectUploadInfo): Promise<void> {
+        submitDocumentPage(correlationId, pageIndex, uploadInfo.filePath);
     }
 }

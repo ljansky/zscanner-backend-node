@@ -6,7 +6,7 @@ import { default as moment } from 'moment';
 import { config } from "../lib/config";
 import { createLogger } from "../lib/logging";
 import { wrapRouteWithErrorHandler, HttpError } from "../lib/utils";
-import { DocumentStorage, DocumentSummary, MetricsStorage, TusUploaderMetadata, Uploader } from "../services/types";
+import { DocumentStorage, DocumentSummary, FolderDefect, MetricsStorage, TusUploaderMetadata, Uploader } from "../services/types";
 
 const formidable = require('koa2-formidable');
 
@@ -76,15 +76,19 @@ export function newDocumentsRouter(
 
         const correlation = metadata.correlation;
         const pageIndex = parseInt(metadata.pageIndex, 10);
-        const contentType = metadata.filetype;
-        
-        const defect = metadata.defectId ? {
-            id: metadata.defectId,
-            name: metadata.defectName,
-            bodyPartId: metadata.bodyPartId
-        } : {};
 
-        await documentStorage.submitLargeDocumentPage(correlation, pageIndex, metadata.filepath, contentType);
+        const defect: FolderDefect | undefined = metadata.defectId ? {
+            defectId: metadata.defectId,
+            name: metadata.defectName,
+            bodyPartId: metadata.bodyPartId,
+        } : undefined;
+
+        await documentStorage.submitLargeDocumentPageWithDefect(correlation, pageIndex, {
+            filePath: metadata.filepath,
+            contentType: metadata.filetype,
+            defect,
+        });
+
         if (!config.UPLOADER_KEEP_PROCESSED_FILES) {
             fs.unlink(metadata.filepath, (err) => {
                 if (err) {
@@ -102,8 +106,12 @@ export function newDocumentsRouter(
 
         const correlation = metadata.correlation;
         const pageIndex = parseInt(metadata.pageIndex, 10);
-        const contentType = metadata.filetype;
-        await documentStorage.submitLargeDocumentPage(correlation, pageIndex, metadata.filepath, contentType);
+
+        await documentStorage.submitLargeDocumentPage(correlation, pageIndex, {
+            filePath: metadata.filepath,
+            contentType: metadata.filetype,
+        });
+
         if (!config.UPLOADER_KEEP_PROCESSED_FILES) {
             fs.unlink(metadata.filepath, (err) => {
                 if (err) {

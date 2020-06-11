@@ -28,7 +28,8 @@ export interface DocumentStorage extends HealthConscious {
     getDocumentTypes(): Promise<DocumentType[]>;
 
     submitDocumentPage(correlationId: string, pageIndex: number, file: string): Promise<void>;
-    submitLargeDocumentPage(correlationId: string, pageIndex: number, file: string, contentType: string): Promise<void>;
+    submitLargeDocumentPage(correlationId: string, pageIndex: number, uploadInfo: PageUploadInfo): Promise<void>;
+    submitLargeDocumentPageWithDefect(correlationId: string, pageIndex: number, uploadInfo: PageWithDefectUploadInfo): Promise<void>;
     submitDocumentSummary(correlationId: string, summary: DocumentSummary): Promise<void>;
 
     getDefectsByFolderId(folderId: string): Promise<FolderDefect[] | undefined>;
@@ -75,6 +76,15 @@ export interface DocumentSummary {
     name: string;
     notes: string;
     user: string;
+}
+
+export interface PageUploadInfo {
+    filePath: string;
+    contentType: string;
+}
+
+export interface PageWithDefectUploadInfo extends PageUploadInfo {
+    defect?: FolderDefect;
 }
 
 export interface PatientDocumentSummary {
