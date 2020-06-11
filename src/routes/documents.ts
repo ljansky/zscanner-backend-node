@@ -6,7 +6,7 @@ import { default as moment } from 'moment';
 import { config } from "../lib/config";
 import { createLogger } from "../lib/logging";
 import { wrapRouteWithErrorHandler, HttpError } from "../lib/utils";
-import { DocumentStorage, DocumentSummary, MetricsStorage, TusUploaderMetadata, Uploader } from "../services/types";
+import { DocumentStorage, DocumentSummary, FolderDefect, MetricsStorage, TusUploaderMetadata, Uploader } from "../services/types";
 
 const formidable = require('koa2-formidable');
 
@@ -39,16 +39,21 @@ export function newDocumentsRouter(
     router.post('/v3/documents/page', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postPage));
     router.post('/v3/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV3));
 
+    uploader.beforeUploadStart('page', validateUpload);
     uploader.onUploadComplete('page', uploadPage);
-    uploader.beforeUploadStart('page', (metadata) => {
+
+    uploader.beforeUploadStart('pageWithDefect', validateUpload);
+    uploader.onUploadComplete('pageWithDefect', uploadPageWithDefect);
+
+    return router;
+
+    function validateUpload(metadata: TusUploaderMetadata) {
         try {
             validateUploadMetadata(metadata);
         } catch (err) {
             throw new HttpError(err.message, 400);
         }
-    });
-
-    return router;
+    }
 
     function validateUploadMetadata(metadata: TusUploaderMetadata) {
         if (!metadata.correlation) {
@@ -63,6 +68,36 @@ export function newDocumentsRouter(
         }
     }
 
+    async function uploadPageWithDefect(metadata: TusUploaderMetadata) {
+        validateUploadMetadata(metadata);
+        if (!metadata.filepath) {
+            throw new Error('No filepath in metadata');
+        }
+
+        const correlation = metadata.correlation;
+        const pageIndex = parseInt(metadata.pageIndex, 10);
+
+        const defect: FolderDefect | undefined = metadata.defectId ? {
+            defectId: metadata.defectId,
+            name: metadata.defectName,
+            bodyPartId: metadata.bodyPartId,
+        } : undefined;
+
+        await documentStorage.submitLargeDocumentPageWithDefect(correlation, pageIndex, {
+            filePath: metadata.filepath,
+            contentType: metadata.filetype,
+            defect,
+        });
+
+        if (!config.UPLOADER_KEEP_PROCESSED_FILES) {
+            fs.unlink(metadata.filepath, (err) => {
+                if (err) {
+                    LOG.error('Error deleting uploaded page file', err);
+                }
+            });
+        }
+    }
+
     async function uploadPage(metadata: TusUploaderMetadata) {
         validateUploadMetadata(metadata);
         if (!metadata.filepath) {
@@ -71,8 +106,12 @@ export function newDocumentsRouter(
 
         const correlation = metadata.correlation;
         const pageIndex = parseInt(metadata.pageIndex, 10);
-        const contentType = metadata.filetype;
-        await documentStorage.submitLargeDocumentPage(correlation, pageIndex, metadata.filepath, contentType);
+
+        await documentStorage.submitLargeDocumentPage(correlation, pageIndex, {
+            filePath: metadata.filepath,
+            contentType: metadata.filetype,
+        });
+
         if (!config.UPLOADER_KEEP_PROCESSED_FILES) {
             fs.unlink(metadata.filepath, (err) => {
                 if (err) {

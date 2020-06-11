@@ -3,7 +3,7 @@ import * as util from 'util';
 
 import { createLogger } from "../../lib/logging";
 import { normalizeString } from "../../lib/utils";
-import { DocumentFolder, DocumentStorage, DocumentSummary, DocumentType, FolderDefect, FoundDocumentFolder, HEALTH_LEVEL_OK } from "../types";
+import { DocumentFolder, DocumentStorage, DocumentSummary, DocumentType, FolderDefect, FoundDocumentFolder, HEALTH_LEVEL_OK, PageUploadInfo, PageWithDefectUploadInfo } from "../types";
 
 const LOG = createLogger(__filename);
 
@@ -20,7 +20,8 @@ export function newDemoDocumentStorage(
         getFolderByBarcode,
         getDocumentTypes,
         submitDocumentPage,
-        submitLargeDocumentPage: submitDocumentPage,
+        submitLargeDocumentPage,
+        submitLargeDocumentPageWithDefect,
         submitDocumentSummary,
         getDefectsByFolderId,
         getHealth: () => ({ level: HEALTH_LEVEL_OK, messages: [] }),
@@ -54,6 +55,19 @@ export function newDemoDocumentStorage(
     async function submitDocumentPage(correlationId: string, pageIndex: number, file: string): Promise<void> {
         const s = await stat(file);
         LOG.info(`Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${file} (${s.size} bytes)`);
+    }
+
+    async function submitLargeDocumentPage(correlationId: string, pageIndex: number, { filePath }: PageUploadInfo): Promise<void> {
+        const s = await stat(filePath);
+        LOG.info(`Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${filePath} (${s.size} bytes)`);
+    }
+
+    async function submitLargeDocumentPageWithDefect(correlationId: string, pageIndex: number, { filePath, defect }: PageWithDefectUploadInfo): Promise<void> {
+        const s = await stat(filePath);
+        LOG.info(`Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${filePath} (${s.size} bytes)`);
+        if (defect) {
+            LOG.info(`Defect posted: correlationId: ${correlationId} page: ${pageIndex} defectId: ${defect.defectId} name: ${defect.name} bodyPartId: ${defect.bodyPartId}`);
+        }
     }
 
     async function getDefectsByFolderId(folderId: string): Promise<FolderDefect[] | undefined> {
