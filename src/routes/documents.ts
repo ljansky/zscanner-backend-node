@@ -39,16 +39,21 @@ export function newDocumentsRouter(
     router.post('/v3/documents/page', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postPage));
     router.post('/v3/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV3));
 
+    uploader.beforeUploadStart('page', validateUpload);
     uploader.onUploadComplete('page', uploadPage);
-    uploader.beforeUploadStart('page', (metadata) => {
+
+    uploader.beforeUploadStart('pageWithDefect', validateUpload);
+    uploader.onUploadComplete('pageWithDefect', uploadPageWithDefect);
+
+    return router;
+
+    function validateUpload(metadata: TusUploaderMetadata) {
         try {
             validateUploadMetadata(metadata);
         } catch (err) {
             throw new HttpError(err.message, 400);
         }
-    });
-
-    return router;
+    }
 
     function validateUploadMetadata(metadata: TusUploaderMetadata) {
         if (!metadata.correlation) {
@@ -60,6 +65,32 @@ export function newDocumentsRouter(
 
         if (!metadata.filetype) {
             throw new Error('No filetype in the request');
+        }
+    }
+
+    async function uploadPageWithDefect(metadata: TusUploaderMetadata) {
+        validateUploadMetadata(metadata);
+        if (!metadata.filepath) {
+            throw new Error('No filepath in metadata');
+        }
+
+        const correlation = metadata.correlation;
+        const pageIndex = parseInt(metadata.pageIndex, 10);
+        const contentType = metadata.filetype;
+        
+        const defect = metadata.defectId ? {
+            id: metadata.defectId,
+            name: metadata.defectName,
+            bodyPartId: metadata.bodyPartId
+        } : {};
+
+        await documentStorage.submitLargeDocumentPage(correlation, pageIndex, metadata.filepath, contentType);
+        if (!config.UPLOADER_KEEP_PROCESSED_FILES) {
+            fs.unlink(metadata.filepath, (err) => {
+                if (err) {
+                    LOG.error('Error deleting uploaded page file', err);
+                }
+            });
         }
     }
 
