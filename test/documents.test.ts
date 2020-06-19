@@ -256,7 +256,7 @@ describe("Documents tests", () => {
                 const url = '/api-zscanner/upload';
                 const data = Buffer.from([1, 2, 3]);
                 const defect: FolderDefect = {
-                    defectId: 'defect1',
+                    id: 'defect1',
                     name: 'Defect name',
                     bodyPartId: 'bodyPart1',
                 };
@@ -268,7 +268,7 @@ describe("Documents tests", () => {
                         correlation: 'CORRELATION',
                         pageIndex: '1',
                         filetype: 'test',
-                        defectId: defect.defectId,
+                        defectId: defect.id,
                         defectName: defect.name,
                         bodyPartId: defect.bodyPartId,
                     },

@@ -6,7 +6,7 @@ import { default as moment } from 'moment';
 import { config } from "../lib/config";
 import { createLogger } from "../lib/logging";
 import { wrapRouteWithErrorHandler, HttpError } from "../lib/utils";
-import { DocumentStorage, DocumentSummary, FolderDefect, MetricsStorage, TusUploaderMetadata, Uploader } from "../services/types";
+import { DocumentStorage, DocumentSummary, FolderDefectRequest, MetricsStorage, TusUploaderMetadata, Uploader } from "../services/types";
 
 const formidable = require('koa2-formidable');
 
@@ -77,8 +77,8 @@ export function newDocumentsRouter(
         const correlation = metadata.correlation;
         const pageIndex = parseInt(metadata.pageIndex, 10);
 
-        const defect: FolderDefect | undefined = metadata.defectId ? {
-            defectId: metadata.defectId,
+        const defect: FolderDefectRequest | undefined = metadata.defectId ? {
+            id: metadata.defectId,
             name: metadata.defectName,
             bodyPartId: metadata.bodyPartId,
         } : undefined;
