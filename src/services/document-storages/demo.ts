@@ -66,7 +66,7 @@ export function newDemoDocumentStorage(
         const s = await stat(filePath);
         LOG.info(`Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${filePath} (${s.size} bytes)`);
         if (defect) {
-            LOG.info(`Defect posted: correlationId: ${correlationId} page: ${pageIndex} defectId: ${defect.defectId} name: ${defect.name} bodyPartId: ${defect.bodyPartId}`);
+            LOG.info(`Defect posted: correlationId: ${correlationId} page: ${pageIndex} defectId: ${defect.id} name: ${defect.name} bodyPartId: ${defect.bodyPartId}`);
         }
     }
 
@@ -167,12 +167,12 @@ export const DEMO_FOLDER_DEFECTS: DemoFolderDefects[] = [
         folderId: '124587112',
         defects: [
             {
-                defectId: 'defect1',
+                id: 'defect1',
                 bodyPartId: 'rightEye',
                 name: 'Name of defect 1',
             },
             {
-                defectId: 'defect2',
+                id: 'defect2',
                 bodyPartId: 'finger',
                 name: 'Name of defect 2',
             },
@@ -182,7 +182,7 @@ export const DEMO_FOLDER_DEFECTS: DemoFolderDefects[] = [
         folderId: '124587113',
         defects: [
             {
-                defectId: 'defect3',
+                id: 'defect3',
                 bodyPartId: 'leftEye',
                 name: 'Name of defect 3',
             },

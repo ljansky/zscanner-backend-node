@@ -161,7 +161,7 @@ describe("Folders/patients tests", () => {
             expect(response.status).toEqual(200);
             expect(response.body).toEqual([
                 {
-                    defectId: 'defect3',
+                    id: 'defect3',
                     bodyPartId: 'leftEye',
                     name: 'Name of defect 3',
                 },
