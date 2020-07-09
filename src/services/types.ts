@@ -85,6 +85,7 @@ export interface PageUploadInfo {
 
 export interface PageWithDefectUploadInfo extends PageUploadInfo {
     defect?: FolderDefectRequest;
+    description?: string;
 }
 
 export interface PatientDocumentSummary {
