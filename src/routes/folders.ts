@@ -120,7 +120,7 @@ export function newFoldersRouter(
     }
 
     async function getFolderDefectsV3(ctx: koa.Context) {
-        const folderId = ctx.params.folderId;
+        const folderId = String(ctx.params.folderId);
 
         metricsStorage.log({
             ts: new Date(),
