@@ -178,6 +178,7 @@ export interface BodyPart {
 
 export interface BodyPartsView {
     id: string;
+    name: string;
     bodyParts: BodyPart[];
 }
 

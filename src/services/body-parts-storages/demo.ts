@@ -39,6 +39,7 @@ export function newDemoBodyPartsStorage(
 export const DEMO_BODY_PARTS_VIEWS: BodyPartsView[] = [
     {
         id: '0',
+        name: 'Head',
         bodyParts:
           [
             {
@@ -55,6 +56,7 @@ export const DEMO_BODY_PARTS_VIEWS: BodyPartsView[] = [
       },
       {
         id: '1',
+        name: 'Arm',
         bodyParts:
           [
             {
