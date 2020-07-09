@@ -85,6 +85,7 @@ export interface PageUploadInfo {
 
 export interface PageWithDefectUploadInfo extends PageUploadInfo {
     defect?: FolderDefectRequest;
+    description?: string;
 }
 
 export interface PatientDocumentSummary {
@@ -178,6 +179,7 @@ export interface BodyPart {
 
 export interface BodyPartsView {
     id: string;
+    name: string;
     bodyParts: BodyPart[];
 }
 

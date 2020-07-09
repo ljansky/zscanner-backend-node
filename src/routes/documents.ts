@@ -87,6 +87,7 @@ export function newDocumentsRouter(
             filePath: metadata.filepath,
             contentType: metadata.filetype,
             defect,
+            description: metadata.description,
         });
 
         if (!config.UPLOADER_KEEP_PROCESSED_FILES) {

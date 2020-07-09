@@ -247,7 +247,7 @@ describe("Documents tests", () => {
             });
     });
 
-    test('Check that page upload with defect bubbles to document storage', async () => {
+    test('Check that page upload with defect and description bubbles to document storage', async () => {
         const storage = newMockDocumentStorage();
         await withApplication({
                 documentStorage: storage,
@@ -255,6 +255,7 @@ describe("Documents tests", () => {
                 const uploadClient = newTusUploadClient(server);
                 const url = '/api-zscanner/upload';
                 const data = Buffer.from([1, 2, 3]);
+                const description = 'photo description';
                 const defect: FolderDefect = {
                     id: 'defect1',
                     name: 'Defect name',
@@ -268,6 +269,7 @@ describe("Documents tests", () => {
                         correlation: 'CORRELATION',
                         pageIndex: '1',
                         filetype: 'test',
+                        description,
                         defectId: defect.id,
                         defectName: defect.name,
                         bodyPartId: defect.bodyPartId,
@@ -287,11 +289,12 @@ describe("Documents tests", () => {
                         file: data.toString('hex'),
                     },
                 ]);
-                expect(storage.postedDefects).toEqual([
+                expect(storage.postedPageSummaries).toEqual([
                     {
                         correlationId: "CORRELATION",
                         pageIndex: 1,
                         defect,
+                        description,
                     },
                 ]);
             });
@@ -312,7 +315,7 @@ function newMockDocumentStorage() {
         submitLargeDocumentPageWithDefect,
         postedSummaries: [] as any[],
         postedPages: [] as any[],
-        postedDefects: [] as any[],
+        postedPageSummaries: [] as any[],
     };
     return c;
 
@@ -330,10 +333,11 @@ function newMockDocumentStorage() {
 
     async function submitLargeDocumentPageWithDefect(correlationId: string, pageIndex: number, uploadInfo: PageWithDefectUploadInfo): Promise<void> {
         submitDocumentPage(correlationId, pageIndex, uploadInfo.filePath);
-        c.postedDefects.push({
+        c.postedPageSummaries.push({
             correlationId,
             pageIndex,
             defect: uploadInfo.defect,
+            description: uploadInfo.description,
         });
     }
 }

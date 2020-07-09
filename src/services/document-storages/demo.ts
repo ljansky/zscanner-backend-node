@@ -62,11 +62,15 @@ export function newDemoDocumentStorage(
         LOG.info(`Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${filePath} (${s.size} bytes)`);
     }
 
-    async function submitLargeDocumentPageWithDefect(correlationId: string, pageIndex: number, { filePath, defect }: PageWithDefectUploadInfo): Promise<void> {
+    async function submitLargeDocumentPageWithDefect(correlationId: string, pageIndex: number, { filePath, defect, description }: PageWithDefectUploadInfo): Promise<void> {
         const s = await stat(filePath);
         LOG.info(`Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${filePath} (${s.size} bytes)`);
         if (defect) {
             LOG.info(`Defect posted: correlationId: ${correlationId} page: ${pageIndex} defectId: ${defect.id} name: ${defect.name} bodyPartId: ${defect.bodyPartId}`);
+        }
+
+        if (description) {
+            LOG.info(`Photo description posted: correlationId: ${correlationId} page: ${pageIndex} description: ${description}`);
         }
     }
 
