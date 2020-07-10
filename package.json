@@ -12,7 +12,7 @@
     "start": "npm run serve",
     "serve": "node out/src/index",
     "prettier": "prettier {src,test,types}/**/*.{ts}",
-    "prettier:fix": "npm run prettier -- --write",
+    "prettier-fix": "npm run prettier -- --write",
     "tslint-fix": "npx tslint --project . --fix",
     "tslint": "npx tslint --project .",
     "ts-start": "npx ts-node src/index",
