@@ -11,6 +11,8 @@
     "build-ts": "rm -rf out && npx tsc",
     "start": "npm run serve",
     "serve": "node out/src/index",
+    "prettier": "prettier {src,test,types}/**/*.{ts}",
+    "prettier:fix": "npm run prettier -- --write",
     "tslint-fix": "npx tslint --project . --fix",
     "tslint": "npx tslint --project .",
     "ts-start": "npx ts-node src/index",
@@ -81,6 +83,7 @@
     "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.5.2",
     "winston-null": "^2.0.0"
