@@ -1,17 +1,22 @@
-import { constructKoaApplication, MetricsStorage } from "./app";
+import { constructKoaApplication, MetricsStorage } from './app';
 import { config } from './lib/config';
-import { createLogger } from "./lib/logging";
-import { newNoopAuthenticator } from "./services/authenticators/noop";
-import { newSeacatAuthenticator } from "./services/authenticators/seacat";
+import { createLogger } from './lib/logging';
+import { newNoopAuthenticator } from './services/authenticators/noop';
+import { newSeacatAuthenticator } from './services/authenticators/seacat';
 import { newDemoBodyPartsStorage } from './services/body-parts-storages/demo';
-import { newDemoDocumentStorage } from "./services/document-storages/demo";
-import { newNoopMetricsStorage } from "./services/metrics-storages/noop";
-import { Authenticator, BodyPartsStorage, DocumentStorage, Uploader } from "./services/types";
-import { newTusStore, newTusUploader } from "./services/uploader/tus-uploader";
+import { newDemoDocumentStorage } from './services/document-storages/demo';
+import { newNoopMetricsStorage } from './services/metrics-storages/noop';
+import {
+    Authenticator,
+    BodyPartsStorage,
+    DocumentStorage,
+    Uploader,
+} from './services/types';
+import { newTusStore, newTusUploader } from './services/uploader/tus-uploader';
 
 const LOG = createLogger(__filename);
 
-process.on("unhandledRejection", (error: any, promise: Promise<any>) => {
+process.on('unhandledRejection', (error: any, promise: Promise<any>) => {
     LOG.error(`Unhandled Rejection: ${error} ${error.stack}`);
     throw error;
 });
@@ -41,15 +46,19 @@ async function start() {
         bodyPartsStorage,
     });
 
-    app.listen(config.PORT, () => LOG.info(`Listening on port ${config.PORT}...`));
+    app.listen(config.PORT, () =>
+        LOG.info(`Listening on port ${config.PORT}...`)
+    );
 }
 
 function constructAuthenticator(): Authenticator {
-    if (config.AUTHENTICATOR === 'seacat'
-        && config.VERIFY_CLIENT_TAG
-        && config.SEACAT_ENDPOINT
-        && config.SEACAT_USERNAME
-        && config.SEACAT_PASSWORD) {
+    if (
+        config.AUTHENTICATOR === 'seacat' &&
+        config.VERIFY_CLIENT_TAG &&
+        config.SEACAT_ENDPOINT &&
+        config.SEACAT_USERNAME &&
+        config.SEACAT_PASSWORD
+    ) {
         return newSeacatAuthenticator({
             seacatEndpoint: config.SEACAT_ENDPOINT,
             seacatUsername: config.SEACAT_USERNAME,

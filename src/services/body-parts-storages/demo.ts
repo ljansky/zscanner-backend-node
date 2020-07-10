@@ -1,9 +1,11 @@
-import { BodyPartsStorage, BodyPartsView, HEALTH_LEVEL_OK, ImageData } from "../types";
+import {
+    BodyPartsStorage,
+    BodyPartsView,
+    HEALTH_LEVEL_OK,
+    ImageData,
+} from '../types';
 
-export function newDemoBodyPartsStorage(
-    {
-    }: {
-    }): BodyPartsStorage {
+export function newDemoBodyPartsStorage({}: {}): BodyPartsStorage {
     return {
         initialize,
         getBodyPartsViews,
@@ -19,7 +21,9 @@ export function newDemoBodyPartsStorage(
         return DEMO_BODY_PARTS_VIEWS;
     }
 
-    async function getBodyPartsViewImage(viewId: string): Promise<ImageData | null> {
+    async function getBodyPartsViewImage(
+        viewId: string
+    ): Promise<ImageData | null> {
         const parsedId = parseInt(viewId, 10);
         if (typeof DEMO_BODY_PARTS_IMAGES[parsedId] !== 'undefined') {
             return {
@@ -40,32 +44,30 @@ export const DEMO_BODY_PARTS_VIEWS: BodyPartsView[] = [
     {
         id: '0',
         name: 'Head',
-        bodyParts:
-          [
+        bodyParts: [
             {
-              id: 'leftEye',
-              name: 'Left eye',
-              coordinates: [0.2, 0.2],
+                id: 'leftEye',
+                name: 'Left eye',
+                coordinates: [0.2, 0.2],
             },
             {
-              id: 'rightEye',
-              name: 'Right eye',
-              coordinates: [0.8, 0.2],
+                id: 'rightEye',
+                name: 'Right eye',
+                coordinates: [0.8, 0.2],
             },
-          ],
-      },
-      {
+        ],
+    },
+    {
         id: '1',
         name: 'Arm',
-        bodyParts:
-          [
+        bodyParts: [
             {
-              id: 'finger',
-              name: 'Finger',
-              coordinates: [0.1, 0.1],
+                id: 'finger',
+                name: 'Finger',
+                coordinates: [0.1, 0.1],
             },
-          ],
-      },
+        ],
+    },
 ];
 
 export const DEMO_BODY_PARTS_IMAGES: string[] = [

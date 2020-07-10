@@ -5,15 +5,13 @@ import { config } from './config';
 const rootFilename = __dirname.replace(/\/lib$/, '');
 
 export function createLogger(fileName: string) {
-    fileName = fileName
-        .replace(rootFilename, '')
-        .replace(/\.(ts|js)$/, '');
+    fileName = fileName.replace(rootFilename, '').replace(/\.(ts|js)$/, '');
     return globalLogger.child({ fileName });
 }
 
 export function disableLogging() {
     globalLogger.transports.forEach((t) => globalLogger.remove(t));
-    globalLogger.add(new (require("winston-null").NullTransport)());
+    globalLogger.add(new (require('winston-null').NullTransport)());
 }
 
 const globalLogger = constructLogger();
@@ -24,11 +22,14 @@ function constructLogger() {
             winston.format.colorize(),
             winston.format.timestamp({ format: 'YYYY-MM-DD hh:mm:ss.SSS' }),
             winston.format.align(),
-            winston.format.printf((info) => `${info.timestamp} ${align(info.fileName, 20)} ${info.level} ${info.message}`),
+            winston.format.printf(
+                (info) =>
+                    `${info.timestamp} ${align(info.fileName, 20)} ${
+                        info.level
+                    } ${info.message}`
+            )
         ),
-        transports: [
-            new winston.transports.Console(),
-        ],
+        transports: [new winston.transports.Console()],
         defaultMeta: {
             service: 'zscanner-backend',
         },
@@ -41,7 +42,9 @@ const SPACES = new Array(1000).fill(' ').join('');
 function align(s: string, len: number) {
     return !s
         ? SPACES.substr(0, len)
-        : s.length < len ? s + SPACES.substr(0, len - s.length)
-            : s.length === len ? s
-                : s.substr(-len);
+        : s.length < len
+        ? s + SPACES.substr(0, len - s.length)
+        : s.length === len
+        ? s
+        : s.substr(-len);
 }

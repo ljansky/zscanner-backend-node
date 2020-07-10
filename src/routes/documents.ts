@@ -3,26 +3,31 @@ import * as koa from 'koa';
 import { default as KoaRouter } from 'koa-router';
 import { default as moment } from 'moment';
 
-import { config } from "../lib/config";
-import { createLogger } from "../lib/logging";
-import { wrapRouteWithErrorHandler, HttpError } from "../lib/utils";
-import { DocumentStorage, DocumentSummary, FolderDefectRequest, MetricsStorage, TusUploaderMetadata, Uploader } from "../services/types";
+import { config } from '../lib/config';
+import { createLogger } from '../lib/logging';
+import { wrapRouteWithErrorHandler, HttpError } from '../lib/utils';
+import {
+    DocumentStorage,
+    DocumentSummary,
+    FolderDefectRequest,
+    MetricsStorage,
+    TusUploaderMetadata,
+    Uploader,
+} from '../services/types';
 
 const formidable = require('koa2-formidable');
 
 const LOG = createLogger(__filename);
 
-export function newDocumentsRouter(
-    {
-        documentStorage,
-        metricsStorage,
-        uploader,
-    }: {
-        documentStorage: DocumentStorage,
-        metricsStorage: MetricsStorage,
-        uploader: Uploader,
-    }) {
-
+export function newDocumentsRouter({
+    documentStorage,
+    metricsStorage,
+    uploader,
+}: {
+    documentStorage: DocumentStorage;
+    metricsStorage: MetricsStorage;
+    uploader: Uploader;
+}) {
     const router = new KoaRouter();
 
     router.prefix(config.ROUTER_PREFIX);
@@ -32,12 +37,35 @@ export function newDocumentsRouter(
         maxFileSize: 1000 * 1024 * 1024,
     });
 
-    router.post('/v1/documents/page', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postPage));
-    router.post('/v1/documents/summary', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
-    router.post('/v2/documents/page', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postPage));
-    router.post('/v2/documents/summary', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postSummaryV1V2));
-    router.post('/v3/documents/page', formidableMiddleware, wrapRouteWithErrorHandler(LOG, postPage));
-    router.post('/v3/documents/summary', wrapRouteWithErrorHandler(LOG, postSummaryV3));
+    router.post(
+        '/v1/documents/page',
+        formidableMiddleware,
+        wrapRouteWithErrorHandler(LOG, postPage)
+    );
+    router.post(
+        '/v1/documents/summary',
+        formidableMiddleware,
+        wrapRouteWithErrorHandler(LOG, postSummaryV1V2)
+    );
+    router.post(
+        '/v2/documents/page',
+        formidableMiddleware,
+        wrapRouteWithErrorHandler(LOG, postPage)
+    );
+    router.post(
+        '/v2/documents/summary',
+        formidableMiddleware,
+        wrapRouteWithErrorHandler(LOG, postSummaryV1V2)
+    );
+    router.post(
+        '/v3/documents/page',
+        formidableMiddleware,
+        wrapRouteWithErrorHandler(LOG, postPage)
+    );
+    router.post(
+        '/v3/documents/summary',
+        wrapRouteWithErrorHandler(LOG, postSummaryV3)
+    );
 
     uploader.beforeUploadStart('page', validateUpload);
     uploader.onUploadComplete('page', uploadPage);
@@ -59,7 +87,10 @@ export function newDocumentsRouter(
         if (!metadata.correlation) {
             throw new Error('No correlation in the request');
         }
-        if (!metadata.pageIndex || !isFinite(parseInt(metadata.pageIndex, 10))) {
+        if (
+            !metadata.pageIndex ||
+            !isFinite(parseInt(metadata.pageIndex, 10))
+        ) {
             throw new Error('No page in the request');
         }
 
@@ -77,18 +108,24 @@ export function newDocumentsRouter(
         const correlation = metadata.correlation;
         const pageIndex = parseInt(metadata.pageIndex, 10);
 
-        const defect: FolderDefectRequest | undefined = metadata.defectId ? {
-            id: metadata.defectId,
-            name: metadata.defectName,
-            bodyPartId: metadata.bodyPartId,
-        } : undefined;
+        const defect: FolderDefectRequest | undefined = metadata.defectId
+            ? {
+                  id: metadata.defectId,
+                  name: metadata.defectName,
+                  bodyPartId: metadata.bodyPartId,
+              }
+            : undefined;
 
-        await documentStorage.submitLargeDocumentPageWithDefect(correlation, pageIndex, {
-            filePath: metadata.filepath,
-            contentType: metadata.filetype,
-            defect,
-            description: metadata.description,
-        });
+        await documentStorage.submitLargeDocumentPageWithDefect(
+            correlation,
+            pageIndex,
+            {
+                filePath: metadata.filepath,
+                contentType: metadata.filetype,
+                defect,
+                description: metadata.description,
+            }
+        );
 
         if (!config.UPLOADER_KEEP_PROCESSED_FILES) {
             fs.unlink(metadata.filepath, (err) => {
@@ -154,7 +191,11 @@ export function newDocumentsRouter(
             return error('No pageIndex in the request');
         }
 
-        await documentStorage.submitDocumentPage(body.correlation, pageIndex, pageFile.path);
+        await documentStorage.submitDocumentPage(
+            body.correlation,
+            pageIndex,
+            pageFile.path
+        );
 
         ctx.response.status = 200;
         ctx.response.message = `OK`;
@@ -192,7 +233,7 @@ export function newDocumentsRouter(
 
         metricsStorage.log({
             ts: new Date(),
-            type: "upload",
+            type: 'upload',
             version: 3,
             user: ctx.state.userId,
             data: {
@@ -248,13 +289,16 @@ export function newDocumentsRouter(
         if (!body.pages || !parseInt(body.pages, 10)) {
             return error('No pages in the request');
         }
-        if (!body.datetime || !moment(body.datetime, "MM/DD/YYYY HH:mm").isValid()) {
+        if (
+            !body.datetime ||
+            !moment(body.datetime, 'MM/DD/YYYY HH:mm').isValid()
+        ) {
             return error('No datetime in the request');
         }
 
         metricsStorage.log({
             ts: new Date(),
-            type: "upload",
+            type: 'upload',
             version: ctx.request.path.includes('/v2/') ? 2 : 1,
             user: ctx.state.userId,
             data: {
@@ -269,7 +313,7 @@ export function newDocumentsRouter(
             documentMode: body.mode,
             documentType: body.type,
             pages: parseInt(body.pages, 10),
-            datetime: moment(body.datetime, "MM/DD/YYYY HH:mm").valueOf(),
+            datetime: moment(body.datetime, 'MM/DD/YYYY HH:mm').valueOf(),
             name: body.name,
             notes: body.notes,
             user: ctx.state.userId,

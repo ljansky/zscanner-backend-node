@@ -1,27 +1,33 @@
-import * as koa from "koa";
-import * as winston from "winston";
+import * as koa from 'koa';
+import * as winston from 'winston';
 
 export type KoaNextFunction = () => Promise<void>;
 
-export function wrapRouteWithErrorHandler(LOG: winston.Logger, handler: (ctx: koa.Context) => Promise<void>) {
+export function wrapRouteWithErrorHandler(
+    LOG: winston.Logger,
+    handler: (ctx: koa.Context) => Promise<void>
+) {
     return async (ctx: koa.Context) => {
         try {
             await handler(ctx);
         } catch (err) {
             ctx.response.status = 500;
             ctx.response.message = 'Error: ' + err;
-            LOG.info(`Error ${err} processing ${ctx.method} ${ctx.url}`, { error: err });
+            LOG.info(`Error ${err} processing ${ctx.method} ${ctx.url}`, {
+                error: err,
+            });
         }
     };
 }
 
 export type RecursivePartial<T> = {
-    [P in keyof T]?:
-    T[P] extends (infer U)[] ? RecursivePartial<U>[] :
-        T[P] extends object ?
-            T[P] extends Buffer ? T[P]
-                : RecursivePartial<T[P]> :
-            T[P];
+    [P in keyof T]?: T[P] extends (infer U)[]
+        ? RecursivePartial<U>[]
+        : T[P] extends object
+        ? T[P] extends Buffer
+            ? T[P]
+            : RecursivePartial<T[P]>
+        : T[P];
 };
 
 export function normalizeString(s: any) {

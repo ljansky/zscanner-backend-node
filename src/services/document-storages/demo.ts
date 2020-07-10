@@ -1,17 +1,23 @@
 import * as fs from 'fs';
 import * as util from 'util';
 
-import { createLogger } from "../../lib/logging";
-import { normalizeString } from "../../lib/utils";
-import { DocumentFolder, DocumentStorage, DocumentSummary, DocumentType, FolderDefect, FoundDocumentFolder, HEALTH_LEVEL_OK, PageUploadInfo, PageWithDefectUploadInfo } from "../types";
+import { createLogger } from '../../lib/logging';
+import { normalizeString } from '../../lib/utils';
+import {
+    DocumentFolder,
+    DocumentStorage,
+    DocumentSummary,
+    DocumentType,
+    FolderDefect,
+    FoundDocumentFolder,
+    HEALTH_LEVEL_OK,
+    PageUploadInfo,
+    PageWithDefectUploadInfo,
+} from '../types';
 
 const LOG = createLogger(__filename);
 
-export function newDemoDocumentStorage(
-    {
-    }: {
-    }): DocumentStorage {
-
+export function newDemoDocumentStorage({}: {}): DocumentStorage {
     const stat = util.promisify(fs.lstat);
 
     return {
@@ -34,13 +40,17 @@ export function newDemoDocumentStorage(
     async function findFolders(query: string): Promise<FoundDocumentFolder[]> {
         query = normalizeString(query);
 
-        return DEMO_FOLDERS
-            .filter((f) => normalizeString(f.externalId).indexOf(query) > -1
-                                    || normalizeString(f.internalId).indexOf(query) > -1
-                                    || normalizeString(f.name).indexOf(query) > -1);
+        return DEMO_FOLDERS.filter(
+            (f) =>
+                normalizeString(f.externalId).indexOf(query) > -1 ||
+                normalizeString(f.internalId).indexOf(query) > -1 ||
+                normalizeString(f.name).indexOf(query) > -1
+        );
     }
 
-    async function getFolderByBarcode(folderBarcode: string): Promise<DocumentFolder | undefined> {
+    async function getFolderByBarcode(
+        folderBarcode: string
+    ): Promise<DocumentFolder | undefined> {
         return DEMO_FOLDERS.find((f) => f.internalId === folderBarcode);
     }
 
@@ -48,33 +58,64 @@ export function newDemoDocumentStorage(
         return DEMO_DOCUMENT_TYPES;
     }
 
-    async function submitDocumentSummary(correlationId: string, summary: DocumentSummary): Promise<void> {
-        LOG.info(`Summary posted: correlationId: ${correlationId} summary: ${JSON.stringify(summary)}`);
+    async function submitDocumentSummary(
+        correlationId: string,
+        summary: DocumentSummary
+    ): Promise<void> {
+        LOG.info(
+            `Summary posted: correlationId: ${correlationId} summary: ${JSON.stringify(
+                summary
+            )}`
+        );
     }
 
-    async function submitDocumentPage(correlationId: string, pageIndex: number, file: string): Promise<void> {
+    async function submitDocumentPage(
+        correlationId: string,
+        pageIndex: number,
+        file: string
+    ): Promise<void> {
         const s = await stat(file);
-        LOG.info(`Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${file} (${s.size} bytes)`);
+        LOG.info(
+            `Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${file} (${s.size} bytes)`
+        );
     }
 
-    async function submitLargeDocumentPage(correlationId: string, pageIndex: number, { filePath }: PageUploadInfo): Promise<void> {
+    async function submitLargeDocumentPage(
+        correlationId: string,
+        pageIndex: number,
+        { filePath }: PageUploadInfo
+    ): Promise<void> {
         const s = await stat(filePath);
-        LOG.info(`Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${filePath} (${s.size} bytes)`);
+        LOG.info(
+            `Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${filePath} (${s.size} bytes)`
+        );
     }
 
-    async function submitLargeDocumentPageWithDefect(correlationId: string, pageIndex: number, { filePath, defect, description }: PageWithDefectUploadInfo): Promise<void> {
+    async function submitLargeDocumentPageWithDefect(
+        correlationId: string,
+        pageIndex: number,
+        { filePath, defect, description }: PageWithDefectUploadInfo
+    ): Promise<void> {
         const s = await stat(filePath);
-        LOG.info(`Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${filePath} (${s.size} bytes)`);
+        LOG.info(
+            `Document posted: correlationId: ${correlationId} page: ${pageIndex} contents: in ${filePath} (${s.size} bytes)`
+        );
         if (defect) {
-            LOG.info(`Defect posted: correlationId: ${correlationId} page: ${pageIndex} defectId: ${defect.id} name: ${defect.name} bodyPartId: ${defect.bodyPartId}`);
+            LOG.info(
+                `Defect posted: correlationId: ${correlationId} page: ${pageIndex} defectId: ${defect.id} name: ${defect.name} bodyPartId: ${defect.bodyPartId}`
+            );
         }
 
         if (description) {
-            LOG.info(`Photo description posted: correlationId: ${correlationId} page: ${pageIndex} description: ${description}`);
+            LOG.info(
+                `Photo description posted: correlationId: ${correlationId} page: ${pageIndex} description: ${description}`
+            );
         }
     }
 
-    async function getDefectsByFolderId(folderId: string): Promise<FolderDefect[] | undefined> {
+    async function getDefectsByFolderId(
+        folderId: string
+    ): Promise<FolderDefect[] | undefined> {
         const result = DEMO_FOLDER_DEFECTS.find((f) => f.folderId === folderId);
         return result ? result.defects : undefined;
     }

@@ -1,22 +1,29 @@
 import fs from 'fs';
-import { Server } from "http";
-import * as koa from "koa";
+import { Server } from 'http';
+import * as koa from 'koa';
 import request, { Response } from 'supertest';
 import tmp from 'tmp';
 import { DataStore, EVENTS } from 'tus-node-server';
 
 import {
     constructKoaApplication,
-    newDemoBodyPartsStorage, newDemoDocumentStorage,
+    newDemoBodyPartsStorage,
+    newDemoDocumentStorage,
     newNoopAuthenticator,
     HEALTH_LEVEL_OK,
     MetricsEvent,
     MetricsStorage,
-} from "../src/app";
-import { disableLogging } from "../src/lib/logging";
-import { newNoopMetricsStorage } from "../src/services/metrics-storages/noop";
-import { Authenticator, BodyPartsStorage, DocumentStorage, TusUploaderMetadata, Uploader } from "../src/services/types";
-import { newTusUploader } from "../src/services/uploader/tus-uploader";
+} from '../src/app';
+import { disableLogging } from '../src/lib/logging';
+import { newNoopMetricsStorage } from '../src/services/metrics-storages/noop';
+import {
+    Authenticator,
+    BodyPartsStorage,
+    DocumentStorage,
+    TusUploaderMetadata,
+    Uploader,
+} from '../src/services/types';
+import { newTusUploader } from '../src/services/uploader/tus-uploader';
 
 disableLogging();
 
@@ -24,13 +31,15 @@ export function newStaticAuthenticator() {
     return {
         ...newNoopAuthenticator(),
         async authenticate(context: koa.Context): Promise<boolean> {
-            context.state.userId = "USER";
+            context.state.userId = 'USER';
             return true;
         },
     };
 }
 
-export function newMockMetricsStorage(): MetricsStorage & { expectEvent(event: MetricsEvent): void | never } {
+export function newMockMetricsStorage(): MetricsStorage & {
+    expectEvent(event: MetricsEvent): void | never;
+} {
     const events: MetricsEvent[] = [];
 
     return {
@@ -47,18 +56,16 @@ export function newMockMetricsStorage(): MetricsStorage & { expectEvent(event: M
 }
 
 class MockStore extends DataStore {
-
     public files: any[] = [];
     constructor(options: any) {
         super(options);
         this.directory = options.directory;
     }
     public create(req: any) {
-        return super.create(req)
-            .then((file) => {
-                this.files.push(file);
-                return file;
-            });
+        return super.create(req).then((file) => {
+            this.files.push(file);
+            return file;
+        });
     }
     public write(req: any, file_id: string) {
         return new Promise((resolve, reject) => {
@@ -88,10 +95,22 @@ export function newMockTusUploader() {
 }
 
 export const newTusUploadClient = (server: Server) => ({
-    create: async ({ url, data, metadata }: { url: string; data: Buffer; metadata: TusUploaderMetadata }) => {
-        const uploadMetadata = Object.keys(metadata).reduce<string[]>((acc, curr) => {
-            return acc.concat(`${curr} ${Buffer.from(metadata[curr]).toString('base64')}`);
-        }, []).join(',');
+    create: async ({
+        url,
+        data,
+        metadata,
+    }: {
+        url: string;
+        data: Buffer;
+        metadata: TusUploaderMetadata;
+    }) => {
+        const uploadMetadata = Object.keys(metadata)
+            .reduce<string[]>((acc, curr) => {
+                return acc.concat(
+                    `${curr} ${Buffer.from(metadata[curr]).toString('base64')}`
+                );
+            }, [])
+            .join(',');
 
         return request(server)
             .post(url)
@@ -99,7 +118,15 @@ export const newTusUploadClient = (server: Server) => ({
             .set('Upload-Length', data.length.toString())
             .set('Upload-Metadata', uploadMetadata);
     },
-    write: async ({ url, createResponse, data }: { url: string; createResponse: Response; data: Buffer; }) => {
+    write: async ({
+        url,
+        createResponse,
+        data,
+    }: {
+        url: string;
+        createResponse: Response;
+        data: Buffer;
+    }) => {
         const fileId = createResponse.header.location.split('/').pop();
         return request(server)
             .patch(`${url}/${fileId}`)
@@ -120,15 +147,15 @@ export async function withApplication<T>(
         patcher,
         port,
     }: {
-        authenticator?: Authenticator,
-        documentStorage?: DocumentStorage,
-        bodyPartsStorage?: BodyPartsStorage,
-        metricsStorage?: MetricsStorage,
-        uploader?: Uploader,
-        patcher?: (app: koa) => void,
-        port?: number,
+        authenticator?: Authenticator;
+        documentStorage?: DocumentStorage;
+        bodyPartsStorage?: BodyPartsStorage;
+        metricsStorage?: MetricsStorage;
+        uploader?: Uploader;
+        patcher?: (app: koa) => void;
+        port?: number;
     },
-    fn: (server: Server) => Promise<T>,
+    fn: (server: Server) => Promise<T>
 ): Promise<T> {
     authenticator = authenticator || newNoopAuthenticator();
     documentStorage = documentStorage || newDemoDocumentStorage({});

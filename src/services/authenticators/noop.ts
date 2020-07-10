@@ -1,4 +1,4 @@
-import { Authenticator, HEALTH_LEVEL_OK } from "../types";
+import { Authenticator, HEALTH_LEVEL_OK } from '../types';
 
 export function newNoopAuthenticator(): Authenticator {
     return {

@@ -3,9 +3,9 @@ import Mockdate from 'mockdate';
 import moment from 'moment';
 import tmp from 'tmp';
 
-import { clearExpiredFiles } from "../src/lib/clear-expired-files";
+import { clearExpiredFiles } from '../src/lib/clear-expired-files';
 
-describe("clearExpiredFiles", () => {
+describe('clearExpiredFiles', () => {
     test(`Check that clearExpiredFiles works`, async () => {
         const actualDate = moment();
         Mockdate.set(actualDate.toDate());
