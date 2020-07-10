@@ -1,15 +1,19 @@
 ///<reference path="../../../types/tus-node-server/index.d.ts" />
 import { CronJob } from 'cron';
 import e2k from 'express-to-koa';
-import { default as Koa } from "koa";
+import { default as Koa } from 'koa';
 import compose from 'koa-compose';
 import { DataStore, EVENTS, FileStore, Server } from 'tus-node-server';
 
 import { clearExpiredFiles } from '../../lib/clear-expired-files';
-import { config } from "../../lib/config";
-import { createLogger } from "../../lib/logging";
+import { config } from '../../lib/config';
+import { createLogger } from '../../lib/logging';
 import { HttpError } from '../../lib/utils';
-import { TusUploaderEventHandler, TusUploaderMetadata, Uploader } from '../types';
+import {
+    TusUploaderEventHandler,
+    TusUploaderMetadata,
+    Uploader,
+} from '../types';
 
 const LOG = createLogger(__filename);
 interface TusUploaderEventHandlers {
@@ -30,8 +34,12 @@ export function newTusStore({
 
     if (directory) {
         const clearJob = new CronJob('0 * * * * *', () => {
-            clearExpiredFiles(directory, config.UPLOADER_EXPIRATION_TIME)
-                .catch((err) => LOG.error('Error while clearing expired files', err));
+            clearExpiredFiles(
+                directory,
+                config.UPLOADER_EXPIRATION_TIME
+            ).catch((err) =>
+                LOG.error('Error while clearing expired files', err)
+            );
         });
         clearJob.start();
     }
@@ -39,12 +47,7 @@ export function newTusStore({
     return store;
 }
 
-export function newTusUploader({
-    store,
-}: {
-    store: DataStore,
-}): Uploader {
-
+export function newTusUploader({ store }: { store: DataStore }): Uploader {
     const tusServer = new Server();
     tusServer.datastore = store;
 
@@ -61,7 +64,13 @@ export function newTusUploader({
     });
 
     const validationMiddleware: Koa.Middleware = async (ctx, next) => {
-        if (ctx.request.headers['x-http-method-override'] ? ctx.request.headers['x-http-method-override'].toUpperCase() === 'POST' : ctx.request.method === 'POST') {
+        if (
+            ctx.request.headers['x-http-method-override']
+                ? ctx.request.headers[
+                      'x-http-method-override'
+                  ].toUpperCase() === 'POST'
+                : ctx.request.method === 'POST'
+        ) {
             const uploadMetadata = ctx.request.header['upload-metadata'];
             if (!uploadMetadata) {
                 throw new HttpError('Missing metadata', 400);
@@ -86,31 +95,42 @@ export function newTusUploader({
     ]);
 
     function parseMetadata(uploadMetadata: string) {
-        const metadataList = uploadMetadata ? uploadMetadata
-            .split(',')
-            .filter(Boolean)
-            .map((m: string) => {
-                const [name, encodedValue] = m.split(' ');
-                return {
-                    name,
-                    value: Buffer.from(encodedValue, 'base64').toString(),
-                };
-            }) : [];
+        const metadataList = uploadMetadata
+            ? uploadMetadata
+                  .split(',')
+                  .filter(Boolean)
+                  .map((m: string) => {
+                      const [name, encodedValue] = m.split(' ');
+                      return {
+                          name,
+                          value: Buffer.from(encodedValue, 'base64').toString(),
+                      };
+                  })
+            : [];
 
-        const metadata: TusUploaderMetadata = metadataList.reduce((acc, curr) => ({
-            ...acc,
-            [curr.name]: curr.value,
-        }), {});
+        const metadata: TusUploaderMetadata = metadataList.reduce(
+            (acc, curr) => ({
+                ...acc,
+                [curr.name]: curr.value,
+            }),
+            {}
+        );
 
         return metadata;
     }
 
     return {
         getMiddleware: () => middleware,
-        onUploadComplete: (uploadType: string, handler: TusUploaderEventHandler) => {
+        onUploadComplete: (
+            uploadType: string,
+            handler: TusUploaderEventHandler
+        ) => {
             onCompleteHandlers[uploadType] = handler;
         },
-        beforeUploadStart: (uploadType: string, handler: TusUploaderEventHandler) => {
+        beforeUploadStart: (
+            uploadType: string,
+            handler: TusUploaderEventHandler
+        ) => {
             beforeStartHandlers[uploadType] = handler;
         },
     };

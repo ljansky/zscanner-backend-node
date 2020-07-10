@@ -1,16 +1,19 @@
 import * as koa from 'koa';
 import { default as KoaRouter } from 'koa-router';
 
-import { config } from "../lib/config";
-import { max } from "../lib/utils";
-import { HealthConscious, HEALTH_LEVEL_ERROR, HEALTH_LEVEL_OK } from "../services/types";
+import { config } from '../lib/config';
+import { max } from '../lib/utils';
+import {
+    HealthConscious,
+    HEALTH_LEVEL_ERROR,
+    HEALTH_LEVEL_OK,
+} from '../services/types';
 
-export function newHealthCheckRouter(
-    {
-        components,
-    }: {
-        components: HealthConscious[],
-    }) {
+export function newHealthCheckRouter({
+    components,
+}: {
+    components: HealthConscious[];
+}) {
     const router = new KoaRouter();
 
     router.prefix(config.ROUTER_PREFIX);
@@ -26,16 +29,23 @@ export function newHealthCheckRouter(
         const totalHealth = components
             .map((c) => c.getHealth())
             .reduce(
-                (acc, current) => ({ level: max(acc.level, current.level), messages: acc.messages.concat(current.messages) }),
-                { level: HEALTH_LEVEL_OK, messages: [] });
+                (acc, current) => ({
+                    level: max(acc.level, current.level),
+                    messages: acc.messages.concat(current.messages),
+                }),
+                { level: HEALTH_LEVEL_OK, messages: [] }
+            );
 
         if (totalHealth.level === HEALTH_LEVEL_OK) {
             ctx.status = 200;
-            ctx.body = { status: "ok" };
+            ctx.body = { status: 'ok' };
         } else {
             ctx.status = 500;
             ctx.body = {
-                status: totalHealth.level < HEALTH_LEVEL_ERROR ? 'warning' : 'error',
+                status:
+                    totalHealth.level < HEALTH_LEVEL_ERROR
+                        ? 'warning'
+                        : 'error',
                 level: totalHealth.level,
                 errors: totalHealth.messages,
             };

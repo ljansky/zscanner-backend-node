@@ -11,7 +11,7 @@
     "build-ts": "rm -rf out && npx tsc",
     "start": "npm run serve",
     "serve": "node out/src/index",
-    "prettier": "prettier {src,test,types}/**/*.{ts}",
+    "prettier": "prettier ./{src,test,types}/**/*.ts",
     "prettier-fix": "npm run prettier -- --write",
     "tslint-fix": "npx tslint --project . --fix",
     "tslint": "npx tslint --project .",
@@ -20,9 +20,14 @@
     "test": "npx jest --coverage",
     "prepare": "npm run build-ts"
   },
+  "lint-staged": {
+    "*.ts": [
+      "npm run prettier-fix"
+    ]
+  },
   "husky": {
     "hooks": {
-      "pre-commit": "npx tslint --project ."
+      "pre-commit": "lint-staged"
     }
   },
   "files": [
@@ -77,6 +82,7 @@
     "@types/uuid": "^3.4.5",
     "husky": "^3.0.0",
     "jest": "^24.8.0",
+    "lint-staged": "^10.2.11",
     "mockdate": "^2.0.5",
     "prettier": "^2.0.5",
     "supertest": "^4.0.2",

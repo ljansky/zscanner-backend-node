@@ -4,9 +4,13 @@ import request from 'supertest';
 import { HttpError } from '../src/lib/utils';
 import { TusUploaderEventHandler } from '../src/services/types';
 
-import { newMockTusUploader, newTusUploadClient, withApplication } from "./common";
+import {
+    newMockTusUploader,
+    newTusUploadClient,
+    withApplication,
+} from './common';
 
-describe("Uploader", () => {
+describe('Uploader', () => {
     const url = '/api-zscanner/upload';
     const data = randomBytes(256);
     const validationHandler: TusUploaderEventHandler = (metadata) => {
@@ -20,27 +24,34 @@ describe("Uploader", () => {
         const uploadHandler = jest.fn();
         uploader.onUploadComplete('test', uploadHandler);
         uploader.beforeUploadStart('test', validationHandler);
-        await withApplication({
-            uploader,
-        }, async (server) => {
-            const uploadClient = newTusUploadClient(server);
+        await withApplication(
+            {
+                uploader,
+            },
+            async (server) => {
+                const uploadClient = newTusUploadClient(server);
 
-            const createResponse = await uploadClient.create({
-                url,
-                data,
-                metadata: {
-                    uploadType: 'test',
-                    requiredData: 'some required data',
-                },
-            });
+                const createResponse = await uploadClient.create({
+                    url,
+                    data,
+                    metadata: {
+                        uploadType: 'test',
+                        requiredData: 'some required data',
+                    },
+                });
 
-            expect(createResponse.status).toEqual(201);
+                expect(createResponse.status).toEqual(201);
 
-            const writeResponse = await uploadClient.write({ url, createResponse, data });
+                const writeResponse = await uploadClient.write({
+                    url,
+                    createResponse,
+                    data,
+                });
 
-            expect(writeResponse.status).toEqual(204);
-            expect(uploadHandler).toHaveBeenCalled();
-        });
+                expect(writeResponse.status).toEqual(204);
+                expect(uploadHandler).toHaveBeenCalled();
+            }
+        );
     });
 
     test('Check that validation is called before upload and upload does not start if validation fails', async () => {
@@ -48,55 +59,64 @@ describe("Uploader", () => {
 
         uploader.beforeUploadStart('test', validationHandler);
 
-        await withApplication({
-            uploader,
-        }, async (server) => {
-            const uploadClient = newTusUploadClient(server);
+        await withApplication(
+            {
+                uploader,
+            },
+            async (server) => {
+                const uploadClient = newTusUploadClient(server);
 
-            const createResponse = await uploadClient.create({
-                url,
-                data,
-                metadata: {
-                    uploadType: 'test',
-                },
-            });
+                const createResponse = await uploadClient.create({
+                    url,
+                    data,
+                    metadata: {
+                        uploadType: 'test',
+                    },
+                });
 
-            expect(createResponse.status).toEqual(400);
-        });
+                expect(createResponse.status).toEqual(400);
+            }
+        );
     });
 
     test('Check that upload fails with 400 if there is no metadata', async () => {
         const uploader = newMockTusUploader();
 
-        await withApplication({
-            uploader,
-        }, async (server) => {
-            const createResponse = await request(server)
-                .post(url)
-                .set('Tus-Resumable', '1.0.0')
-                .set('Upload-Length', data.length.toString());
+        await withApplication(
+            {
+                uploader,
+            },
+            async (server) => {
+                const createResponse = await request(server)
+                    .post(url)
+                    .set('Tus-Resumable', '1.0.0')
+                    .set('Upload-Length', data.length.toString());
 
-            expect(createResponse.status).toEqual(400);
-        });
+                expect(createResponse.status).toEqual(400);
+            }
+        );
     });
 
     test('Check that upload fails with 400 if there is no uploadType in metadata', async () => {
         const uploader = newMockTusUploader();
 
-        await withApplication({
-            uploader,
-        }, async (server) => {
-            const uploadClient = newTusUploadClient(server);
+        await withApplication(
+            {
+                uploader,
+            },
+            async (server) => {
+                const uploadClient = newTusUploadClient(server);
 
-            const createResponse = await uploadClient.create({
-                url,
-                data,
-                metadata: {
-                    anyData: 'any value',
-                },
-            });
+                const createResponse = await uploadClient.create({
+                    url,
+                    data,
+                    metadata: {
+                        anyData: 'any value',
+                    },
+                });
 
-            expect(createResponse.status).toEqual(400);
-        });
+                expect(createResponse.status).toEqual(400);
+            }
+        );
     });
 });

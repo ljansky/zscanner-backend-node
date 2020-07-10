@@ -1,22 +1,20 @@
 import * as koa from 'koa';
 import * as rp from 'request-promise';
 
-import { createLogger } from "../../lib/logging";
-import { Authenticator, HEALTH_LEVEL_OK } from "../types";
+import { createLogger } from '../../lib/logging';
+import { Authenticator, HEALTH_LEVEL_OK } from '../types';
 
 const LOG = createLogger(__filename);
 
-export function newSeacatAuthenticator(
-    {
-        seacatEndpoint,
-        seacatUsername,
-        seacatPasword,
-    }: {
-        seacatEndpoint: string,
-        seacatUsername: string,
-        seacatPasword: string,
-    }): Authenticator {
-
+export function newSeacatAuthenticator({
+    seacatEndpoint,
+    seacatUsername,
+    seacatPasword,
+}: {
+    seacatEndpoint: string;
+    seacatUsername: string;
+    seacatPasword: string;
+}): Authenticator {
     return {
         initialize,
         authenticate,
@@ -24,8 +22,7 @@ export function newSeacatAuthenticator(
     };
 
     // tslint:disable-next-line: no-empty
-    async function initialize() {
-    }
+    async function initialize() {}
 
     async function authenticate(ctx: koa.Context): Promise<boolean> {
         let clientTag = ctx.headers['x-sc-client-tag'];
@@ -34,7 +31,7 @@ export function newSeacatAuthenticator(
         }
 
         // seacat neposila v hlavicce hranate zavorky - nutno doplnit
-        if (!((clientTag.includes("[") && clientTag.includes("]")))) {
+        if (!(clientTag.includes('[') && clientTag.includes(']'))) {
             clientTag = `[${clientTag}]`;
         }
 
@@ -69,7 +66,7 @@ export function newSeacatAuthenticator(
         function authFail() {
             ctx.status = 401;
             ctx.body = {
-                error: "invalid-client-tag",
+                error: 'invalid-client-tag',
             };
             return false;
         }

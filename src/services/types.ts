@@ -23,14 +23,31 @@ export interface DocumentStorage extends HealthConscious {
     initialize(): Promise<void>;
 
     findFolders(query: string, user: string): Promise<FoundDocumentFolder[]>;
-    getFolderByBarcode(folderBarcode: string): Promise<DocumentFolder | undefined>;
+    getFolderByBarcode(
+        folderBarcode: string
+    ): Promise<DocumentFolder | undefined>;
 
     getDocumentTypes(): Promise<DocumentType[]>;
 
-    submitDocumentPage(correlationId: string, pageIndex: number, file: string): Promise<void>;
-    submitLargeDocumentPage(correlationId: string, pageIndex: number, uploadInfo: PageUploadInfo): Promise<void>;
-    submitLargeDocumentPageWithDefect(correlationId: string, pageIndex: number, uploadInfo: PageWithDefectUploadInfo): Promise<void>;
-    submitDocumentSummary(correlationId: string, summary: DocumentSummary): Promise<void>;
+    submitDocumentPage(
+        correlationId: string,
+        pageIndex: number,
+        file: string
+    ): Promise<void>;
+    submitLargeDocumentPage(
+        correlationId: string,
+        pageIndex: number,
+        uploadInfo: PageUploadInfo
+    ): Promise<void>;
+    submitLargeDocumentPageWithDefect(
+        correlationId: string,
+        pageIndex: number,
+        uploadInfo: PageWithDefectUploadInfo
+    ): Promise<void>;
+    submitDocumentSummary(
+        correlationId: string,
+        summary: DocumentSummary
+    ): Promise<void>;
 
     getDefectsByFolderId(folderId: string): Promise<FolderDefect[] | undefined>;
 }
@@ -111,7 +128,11 @@ export interface FolderDefect {
     name: string;
 }
 
-export type MetricsEvent = DocumentSummaryUploadMetricsEvent | DocumentFolderQueryMetricsEvent | DocumentFolderDecodeMetricsEvent | DocumentFolderGetDefectsMetricsEvent;
+export type MetricsEvent =
+    | DocumentSummaryUploadMetricsEvent
+    | DocumentFolderQueryMetricsEvent
+    | DocumentFolderDecodeMetricsEvent
+    | DocumentFolderGetDefectsMetricsEvent;
 
 interface BaseMetricsEvent {
     ts: Date;
@@ -153,8 +174,14 @@ interface DocumentFolderGetDefectsMetricsEvent extends BaseMetricsEvent {
 
 export interface Uploader {
     getMiddleware: () => koa.Middleware;
-    onUploadComplete: (uploadType: string, handler: TusUploaderEventHandler) => void;
-    beforeUploadStart: (uploadType: string, handler: TusUploaderEventHandler) => void;
+    onUploadComplete: (
+        uploadType: string,
+        handler: TusUploaderEventHandler
+    ) => void;
+    beforeUploadStart: (
+        uploadType: string,
+        handler: TusUploaderEventHandler
+    ) => void;
 }
 
 export interface TusEvent {

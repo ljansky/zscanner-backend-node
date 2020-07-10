@@ -1,4 +1,4 @@
-import { HEALTH_LEVEL_OK, MetricsStorage } from "../types";
+import { HEALTH_LEVEL_OK, MetricsStorage } from '../types';
 
 export function newNoopMetricsStorage(): MetricsStorage {
     return {
