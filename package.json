@@ -57,7 +57,7 @@
     "pug": "^2.0.0-rc.1",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
-    "tus-node-server": "^0.3.2",
+    "tus-node-server": "git+https://github.com/ljansky/tus-node-server.git",
     "uuid": "^3.4.0",
     "winston": "^3.3.3"
   },
